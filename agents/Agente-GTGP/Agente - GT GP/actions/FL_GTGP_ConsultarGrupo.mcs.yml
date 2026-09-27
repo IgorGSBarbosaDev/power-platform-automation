@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: FL_GTGP_ConsultarGrupo
+kind: TaskDialog
+inputs:
+  - kind: AutomaticTaskInput
+    propertyName: text
+    description: |-
+      Campo da Base GTGP usado para filtrar os colaboradores.
+
+      Valores permitidos:
+      CEO1, CEO2, CEO3, CEO4, CEO5, CEO6, CEO7, Programa, Status,
+      Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo, IndustrialStaff.
+
+      Regras:
+      - Quando o usuário mencionar uma área ou função organizacional sem informar o nível, como RH, Recursos Humanos, Financeiro ou Jurídico, use CEO4.
+      - Só use CEO1, CEO2, CEO3, CEO5, CEO6 ou CEO7 quando o usuário indicar explicitamente esse nível.
+      - Para programa GT/GP use Programa.
+      - Para enquadramento use Enquadre.
+      - Para Pool RH ou Área use Status.
+
+  - kind: AutomaticTaskInput
+    propertyName: text_1
+    description: |-
+      Valor usado para filtrar a Base GTGP.
+
+      Quando o usuário utilizar abreviações ou nomes em português, converta para a nomenclatura utilizada na base.
+
+      Exemplos:
+      RH, Recursos Humanos ou HR → Human Resources
+      TI, T.I., Tecnologia da Informação ou IT → Information Technology
+
+      Quando não houver uma correspondência conhecida, preserve o valor informado pelo usuário.
+
+      Exemplos:
+      "pessoas do RH" → RH
+      "todos os GP3" → GP3
+      "todos os Trainees" → GTs no geral
+      "quem está em Pool RH" → Pool RH
+      "pessoas de Belo Horizonte" → Belo Horizonte
+
+outputs:
+  - propertyName: status
+
+  - propertyName: quantidade
+    description: Quantidade total de colaboradores encontrados. Use apenas como informação complementar à lista quando o usuário solicitar os colaboradores.
+
+  - propertyName: resultado
+    description: |-
+      Lista completa dos colaboradores encontrados pela consulta, contendo nome, matrícula, cargo, programa, status, enquadramento, geração, CEO e localidade.
+
+      Quando o usuário pedir "todos", "liste", "quem são", "quais pessoas" ou equivalente, use esta saída para apresentar TODOS os registros retornados. Nunca responda apenas com a quantidade quando a lista completa estiver disponível.
+
+action:
+  kind: InvokeFlowTaskAction
+  flowId: 4024488c-f7a5-f111-b8dd-000d3a5c36cb
+  connectionProperties:
+    $kind: ConnectionProperties
+    diagnostics:
+    mode: Invoker
+
+outputMode: All

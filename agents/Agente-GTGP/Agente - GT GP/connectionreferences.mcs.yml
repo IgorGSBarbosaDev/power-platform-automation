@@ -1,0 +1,3 @@
+﻿connectionReferences:
+  - connectionReferenceLogicalName: cr200_sharedexcelonlinebusiness_88165
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness

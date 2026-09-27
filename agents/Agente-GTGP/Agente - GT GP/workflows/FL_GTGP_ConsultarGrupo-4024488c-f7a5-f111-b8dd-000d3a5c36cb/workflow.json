@@ -1,0 +1,370 @@
+﻿{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness": {
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "cr200_sharedexcelonlinebusiness_88165"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "metadata": {
+        "defaultToEmbeddedConnections": true
+      },
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "Crit\u00E9rio pelo qual o grupo deve ser filtrado. Valores permitidos: CEO1, CEO2, CEO3, CEO4, CEO5, CEO6, CEO7, Programa, Status, Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo ou IndustrialStaff.",
+                  "title": "campo",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "text_1": {
+                  "description": "Valor que deve ser procurado no campo informado. Exemplos: RH, GP3, Pool RH, Belo Horizonte ou ago/2025.",
+                  "title": "valor",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "required": [
+                "text",
+                "text_1"
+              ]
+            }
+          },
+          "metadata": {
+            "operationMetadataId": "b8f61c18-7224-4f8a-9c5f-72fbce5df764"
+          }
+        }
+      },
+      "actions": {
+        "Respond_to_the_agent": {
+          "type": "Response",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "title": "status",
+                  "description": "",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "resultado": {
+                  "title": "resultado",
+                  "description": "",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "quantidade": {
+                  "title": "quantidade",
+                  "description": "",
+                  "type": "number",
+                  "x-ms-content-hint": "NUMBER",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "additionalProperties": {}
+            },
+            "statusCode": 200,
+            "body": {
+              "status": "@{if(\r\n  equals(length(body(\u0027Selecionar\u0027)), 0),\r\n  \u0027nao_encontrado\u0027,\r\n  \u0027encontrado\u0027\r\n)}",
+              "resultado": "@{string(body(\u0027Selecionar\u0027))}",
+              "quantidade": "@length(body(\u0027Selecionar\u0027))"
+            }
+          },
+          "runAfter": {
+            "Selecionar": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "81c94f73-dd52-465c-ad3b-a4686da63cc3"
+          }
+        },
+        "Inicializar_vari\u00E1vel": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ColunaFiltro",
+                "type": "string"
+              }
+            ]
+          },
+          "runAfter": {}
+        },
+        "Op\u00E7\u00E3o": {
+          "type": "Switch",
+          "expression": "@triggerBody()?[\u0027text\u0027]",
+          "default": {
+            "actions": {}
+          },
+          "cases": {
+            "CEO1": {
+              "actions": {
+                "Definir_vari\u00E1vel": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "DescricaoCEO1"
+                  }
+                }
+              },
+              "case": "CEO1"
+            },
+            "CEO3": {
+              "actions": {
+                "Definir_vari\u00E1vel_1": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "DescricaoCEO3"
+                  }
+                }
+              },
+              "case": "CEO3"
+            },
+            "CEO4": {
+              "actions": {
+                "Definir_vari\u00E1vel_2": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "DescricaoCEO4"
+                  }
+                }
+              },
+              "case": "CEO4"
+            },
+            "CEO5": {
+              "actions": {
+                "Definir_vari\u00E1vel_3": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "DescricaoCEO5"
+                  }
+                }
+              },
+              "case": "CEO5"
+            },
+            "Programa": {
+              "actions": {
+                "Definir_vari\u00E1vel_4": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Programa_Vigente"
+                  }
+                }
+              },
+              "case": "Programa"
+            },
+            "Status": {
+              "actions": {
+                "Definir_vari\u00E1vel_5": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Status_Trainee"
+                  }
+                }
+              },
+              "case": "Status"
+            },
+            "Gera\u00E7\u00E3o_GT": {
+              "actions": {
+                "Definir_vari\u00E1vel_6": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Geracao_GT"
+                  }
+                }
+              },
+              "case": "GeracaoGT"
+            },
+            "Gera\u00E7\u00E3o_GP": {
+              "actions": {
+                "Definir_vari\u00E1vel_7": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Geracao_GP"
+                  }
+                }
+              },
+              "case": "GeracaoGP"
+            },
+            "Localidade": {
+              "actions": {
+                "Definir_vari\u00E1vel_8": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Localidade"
+                  }
+                }
+              },
+              "case": "Localidade"
+            },
+            "Cargo": {
+              "actions": {
+                "Definir_vari\u00E1vel_9": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "DescricaoCargo"
+                  }
+                }
+              },
+              "case": "Cargo"
+            },
+            "IndustrialStaff": {
+              "actions": {
+                "Definir_vari\u00E1vel_11": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Industrial_Staff"
+                  }
+                }
+              },
+              "case": "IndustrialStaff"
+            },
+            "Enquadre": {
+              "actions": {
+                "Definir_vari\u00E1vel_10": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Enquadre"
+                  }
+                }
+              },
+              "case": "Enquadre"
+            }
+          },
+          "runAfter": {
+            "Inicializar_vari\u00E1vel_2": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Inicializar_vari\u00E1vel_2": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ValorFiltro",
+                "type": "string",
+                "value": "@triggerBody()?[\u0027text_1\u0027]"
+              }
+            ]
+          },
+          "runAfter": {
+            "Inicializar_vari\u00E1vel": [
+              "Succeeded"
+            ]
+          }
+        },
+        "FiltroOData": {
+          "type": "Compose",
+          "inputs": "@concat(\r\n  \u0027contains(\u0027,\r\n  variables(\u0027ColunaFiltro\u0027),\r\n  \u0027,\u0027\u0027\u0027,\r\n  replace(trim(variables(\u0027ValorFiltro\u0027)),\u0027\u0027\u0027\u0027,\u0027\u0027\u0027\u0027\u0027\u0027),\r\n  \u0027\u0027\u0027)\u0027\r\n)",
+          "runAfter": {
+            "Op\u00E7\u00E3o": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Listar_linhas_presentes_em_uma_tabela": {
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "source": "groups/d3ca1904-1a69-4a6f-a6c6-b8473fa98a54",
+              "drive": "b!lMd-qKD81UKhxH_CWtN0oZdjDya1bPhAqCawCBjCpNA_nShNGg0STr1IEJzcoTjP",
+              "file": "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D",
+              "table": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}",
+              "$filter": "@outputs(\u0027FiltroOData\u0027)",
+              "$select": "Matricula,Nome,DescricaoCargo,Programa_Vigente,Status_Trainee,Enquadre,Geracao_GT,Geracao_GP,DescricaoCEO3,DescricaoCEO4,DescricaoCEO5,Localidade"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "operationId": "GetItems",
+              "connectionName": "shared_excelonlinebusiness"
+            }
+          },
+          "runAfter": {
+            "FiltroOData": [
+              "Succeeded"
+            ]
+          },
+          "runtimeConfiguration": {
+            "paginationPolicy": {
+              "minimumItemCount": 500
+            }
+          },
+          "metadata": {
+            "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D": "/Canal Talent Development/Programas GT e GP/Base/Base GTGP.xlsx",
+            "tableId": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}"
+          }
+        },
+        "Selecionar": {
+          "type": "Select",
+          "inputs": {
+            "from": "@outputs(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027body/value\u0027]",
+            "select": {
+              "Matricula": "@item()?[\u0027Matricula\u0027]",
+              "Nome": "@item()?[\u0027Nome\u0027]",
+              "Cargo": "@item()?[\u0027DescricaoCargo\u0027]",
+              "Programa": "@item()?[\u0027Programa_Vigente\u0027]",
+              "Status": "@item()?[\u0027Status_Trainee\u0027]",
+              "Enquadre": "@item()?[\u0027Enquadre\u0027]",
+              "GeracaoGT": "@item()?[\u0027Geracao_GT\u0027]",
+              "GeracaoGP": "@item()?[\u0027Geracao_GP\u0027]",
+              "CEO3": "@item()?[\u0027DescricaoCEO3\u0027]",
+              "CEO4": "@item()?[\u0027DescricaoCEO4\u0027]",
+              "Localidade": "@item()?[\u0027Localidade\u0027]",
+              "CEO1": "@item()?[\u0027DescricaoCEO1\u0027]"
+            }
+          },
+          "runAfter": {
+            "Listar_linhas_presentes_em_uma_tabela": [
+              "Succeeded"
+            ]
+          }
+        }
+      },
+      "outputs": {}
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,132 @@
+﻿{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "name": "shared-excelonlinebu-9f38d0e0-156b-4d2f-bc85-c1b8e707eb06",
+          "connectionReferenceLogicalName": "cr200_sharedexcelonlinebusiness_88165"
+        },
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "b8f61c18-7224-4f8a-9c5f-72fbce5df764"
+          },
+          "type": "Request",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "Nome ou matr\u00EDcula do colaborador a ser consultado.",
+                  "title": "busca",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Respond_to_the_agent": {
+          "runAfter": {
+            "Matriz_do_filtro": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "81c94f73-dd52-465c-ad3b-a4686da63cc3"
+          },
+          "type": "Response",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "title": "status",
+                  "description": "Indica o resultado da busca: encontrado, nao_encontrado ou multiplos.",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "resultado": {
+                  "title": "resultado",
+                  "description": "Cont\u00E9m os dados encontrados do colaborador ou uma mensagem explicando o resultado da busca.",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "additionalProperties": {}
+            },
+            "statusCode": 200,
+            "body": {
+              "status": "@{if(\r\n  equals(length(body(\u0027Matriz_do_filtro\u0027)), 0),\r\n  \u0027nao_encontrado\u0027,\r\n  if(\r\n    equals(length(body(\u0027Matriz_do_filtro\u0027)), 1),\r\n    \u0027encontrado\u0027,\r\n    \u0027multiplos\u0027\r\n  )\r\n)}",
+              "resultado": "@{string(body(\u0027Matriz_do_filtro\u0027))}"
+            }
+          }
+        },
+        "Listar_linhas_presentes_em_uma_tabela": {
+          "runAfter": {},
+          "metadata": {
+            "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D": "/Canal Talent Development/Programas GT e GP/Base/Base GTGP.xlsx",
+            "tableId": "{F1563303-159D-4D69-BCC0-E86A511D0871}"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "source": "groups/d3ca1904-1a69-4a6f-a6c6-b8473fa98a54",
+              "drive": "b!lMd-qKD81UKhxH_CWtN0oZdjDya1bPhAqCawCBjCpNA_nShNGg0STr1IEJzcoTjP",
+              "file": "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D",
+              "table": "{F1563303-159D-4D69-BCC0-E86A511D0871}"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "operationId": "GetItems",
+              "connectionName": "shared_excelonlinebusiness"
+            }
+          }
+        },
+        "Matriz_do_filtro": {
+          "runAfter": {
+            "Listar_linhas_presentes_em_uma_tabela": [
+              "Succeeded"
+            ]
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@outputs(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027body/value\u0027]",
+            "where": "@or(\n  equals(\n    string(item()?[\u0027Matricula\u0027]),\n    trim(triggerBody()?[\u0027text\u0027])\n  ),\n  contains(\n    toLower(string(item()?[\u0027Nome\u0027])),\n    toLower(trim(triggerBody()?[\u0027text\u0027]))\n  )\n)"
+          }
+        }
+      },
+      "outputs": {}
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

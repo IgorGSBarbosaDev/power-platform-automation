@@ -1,0 +1,144 @@
+mcs.metadata:
+  componentName: FL_GTGP_FiltrarAvaliacoes
+kind: TaskDialog
+inputs:
+  - kind: AutomaticTaskInput
+    propertyName: text
+    description: |-
+      Nota de performance utilizada como filtro.
+
+      Extraia somente a nota solicitada pelo usuário.
+
+      Exemplos:
+      "nota 5" → 5
+      "tiraram 4" → 4
+
+  - kind: AutomaticTaskInput
+    propertyName: text_1
+    description: |-
+      Potencial utilizado como filtro.
+
+      Extraia somente o potencial solicitado pelo usuário e mantenha a nomenclatura utilizada na base.
+
+      Exemplos:
+      "potencial AP" → AP
+      "nota 5 e AP" → AP
+
+  - kind: AutomaticTaskInput
+    propertyName: text_2
+    description: |-
+      Define se a consulta deve considerar qualquer avaliação histórica ou somente a última avaliação registrada na base.
+
+      Valores permitidos:
+      - qualquer
+      - ultima
+
+      Use "ultima" somente quando o usuário mencionar explicitamente:
+      - última avaliação;
+      - avaliação mais recente;
+      - último ciclo;
+      - última nota/potencial;
+      ou equivalente.
+
+      Nos demais casos, use "qualquer".
+
+      Exemplos:
+      "quem tirou 5 e AP?" → qualquer
+      "quem tirou 5 e AP na última avaliação?" → ultima
+
+  - kind: AutomaticTaskInput
+    propertyName: text_3
+    description: |-
+      Filtro adicional para restringir os colaboradores.
+
+      Valores permitidos:
+      Nenhum
+      CEO1
+      CEO2
+      CEO3
+      CEO4
+      CEO5
+      CEO6
+      CEO7
+      Programa
+      Status
+      Enquadre
+      GeracaoGT
+      GeracaoGP
+      Localidade
+      Cargo
+      IndustrialStaff
+
+      Se o usuário NÃO solicitar filtro adicional de grupo, use obrigatoriamente:
+      Nenhum
+
+      Nunca pergunte ao usuário se deseja adicionar um filtro.
+
+  - kind: AutomaticTaskInput
+    propertyName: text_4
+    description: |-
+      Valor correspondente ao filtro de grupo.
+
+      Se campoGrupo = Nenhum, use obrigatoriamente:
+      Nenhum
+
+      Não pergunte ao usuário por um filtro adicional quando ele não tiver solicitado um.
+
+modelDisplayName: Filtrar avaliações GT/GP
+modelDescription: |-
+  Localiza colaboradores a partir de critérios de avaliação.
+
+  Use esta ferramenta quando o usuário quiser descobrir quais colaboradores possuem determinada combinação de Nota e Potencial.
+
+  Também pode restringir a consulta:
+  - à última avaliação registrada na base;
+  - a um grupo organizacional;
+  - CEO;
+  - programa;
+  - status;
+  - enquadramento;
+  - geração;
+  - localidade;
+  - cargo;
+  - Industrial/Staff.
+
+  Exemplos:
+  - "Liste todos que tiraram nota 5 e potencial AP."
+  - "Quem tirou nota 5 e AP na última avaliação?"
+  - "Liste todos com nota 5 e potencial AP da Industrial Vice Presidency."
+outputs:
+  - propertyName: status
+    description: Indica se foram encontrados colaboradores que atendem aos critérios de avaliação solicitados.
+
+  - propertyName: quantidade
+    description: Quantidade total de colaboradores encontrados.
+
+  - propertyName: resultado
+    description: |-
+      Contém todos os colaboradores encontrados e seus dados de avaliação.
+
+      Quando o usuário solicitar uma lista, use todos os registros retornados.
+
+      Apresente obrigatoriamente, no mínimo:
+      - Nome
+      - Matrícula
+
+      Quando relevante, apresente também:
+      - ciclo da avaliação;
+      - Nota;
+      - Potencial;
+      - Enquadramento;
+      - Programa.
+
+      Nunca substitua a lista apenas pela quantidade quando os registros estiverem disponíveis.
+
+action:
+  kind: InvokeFlowTaskAction
+  flowId: 5de91af7-b5a7-f111-b8dc-000d3a3617ed
+  connectionProperties:
+    $kind: ConnectionProperties
+    diagnostics:
+    mode: Invoker
+    usageDescription: Use sua conta corporativa para consultar os dados autorizados de avaliação dos programas GT e GP.
+
+outputMode: All

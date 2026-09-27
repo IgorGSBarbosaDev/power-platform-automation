@@ -1,0 +1,24 @@
+mcs.metadata:
+  componentName: FL_GTGP_ConsultarColaborador
+kind: TaskDialog
+inputs:
+  - kind: AutomaticTaskInput
+    propertyName: text
+    name: Nome ou matrícula
+
+modelDisplayName: Consultar colaborador GT/GP
+modelDescription: Consulta informações de um colaborador dos programas GT e GP a partir de seu nome ou matrícula. Use esta ferramenta quando o usuário solicitar dados, informações, histórico ou perfil de um colaborador específico.
+outputs:
+  - propertyName: status
+
+  - propertyName: resultado
+
+action:
+  kind: InvokeFlowTaskAction
+  flowId: d898fc48-61a5-f111-b8dd-00224808b0ee
+  connectionProperties:
+    $kind: ConnectionProperties
+    diagnostics:
+    mode: Invoker
+
+outputMode: All
