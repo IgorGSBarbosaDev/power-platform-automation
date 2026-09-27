@@ -68,6 +68,13 @@ Documentação de arquitetura, inventário, dependências e decisões importante
 
 ## Como o assistente deve trabalhar neste repositório
 
+### Uso do PAC CLI
+
+- O PAC CLI é disponibilizado pela extensão instalada no VS Code; não presuma que esteja instalado globalmente no computador ou disponível em um shell externo.
+- Execute comandos PAC no terminal integrado do VS Code.
+- Antes de operações que dependam do ambiente Microsoft, confira a autenticação com `pac auth who`.
+- Se a sintaxe ou os parâmetros de um comando forem desconhecidos, consulte o `help` correspondente antes de executá-lo.
+
 Ao realizar alterações:
 
 1. Entender primeiro o componente existente antes de modificá-lo.
