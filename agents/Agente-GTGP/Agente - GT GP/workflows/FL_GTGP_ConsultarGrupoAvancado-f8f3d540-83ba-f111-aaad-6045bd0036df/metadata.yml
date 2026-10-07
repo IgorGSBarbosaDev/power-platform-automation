@@ -1,0 +1,32 @@
+﻿jsonFileName: workflows/FL_GTGP_ConsultarGrupoAvancado-f8f3d540-83ba-f111-aaad-6045bd0036df/workflow.json
+workflowId: f8f3d540-83ba-f111-aaad-6045bd0036df
+name: FL_GTGP_ConsultarGrupoAvancado
+type: 1
+description: Consulta populacional GT/GP com filtros opcionais combinados por AND.
+subprocess: false
+category: 5
+mode: 0
+scope: 4
+onDemand: false
+triggerOnCreate: false
+triggerOnDelete: false
+asyncAutodelete: false
+syncWorkflowLogOnFailure: false
+stateCode: 1
+statusCode: 2
+runAs: 1
+isTransacted: true
+introducedVersion: 1.0
+isCustomizable:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: iscustomizableanddeletable
+businessProcessType: 0
+isCustomProcessingStepAllowedForOtherPublishers:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: canbedeleted
+modernFlowType: 1
+primaryEntity: none
+connectionReferences:
+- cr200_sharedexcelonlinebusiness_88165

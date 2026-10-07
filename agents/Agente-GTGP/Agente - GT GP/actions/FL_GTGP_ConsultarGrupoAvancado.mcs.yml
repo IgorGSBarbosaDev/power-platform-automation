@@ -1,0 +1,29 @@
+mcs.metadata:
+  componentName: FL_GTGP_ConsultarGrupoAvancado
+kind: TaskDialog
+inputs:
+  - kind: AutomaticTaskInput
+    propertyName: FiltrosJson
+    description: |-
+      Envie JSON com dois ou mais filtros simultâneos. Use CEO3/CEO4/CEO5
+      para área atual e AreaFimCEO1..5 para destino. STEM filtra
+      Classificacao_STEM. Inclua Programa só quando o usuário disser GT, GP,
+      Global Trainee ou Global Professional explicitamente.
+      "Trainees" ou "participantes" sozinho não implica Programa.
+      Use Status para Área, Pool RH e outros status; Enquadre somente para
+      GT0, GT1, GT2, GP3 ou GP4. Nunca use Enquadre para Área.
+modelDisplayName: ConsultarGrupoAvancado
+modelDescription: Consulta participantes GT/GP combinando dois ou mais critérios com AND. Use Programa para GT/GP; CEO3, CEO4 ou CEO5 para área atual; AreaFimCEO1 a AreaFimCEO5 para área de destino; Status para Área ou Pool RH; Enquadre somente para GT0, GT1, GT2, GP3 ou GP4; GeracaoGT/GeracaoGP para geração; e Localidade, Cargo, IndustrialStaff ou STEM quando aplicável. Nunca use Enquadre para representar Área. Para um critério, use ConsultarGrupo.
+outputs:
+  - propertyName: status
+  - propertyName: resultado
+    description: Lista completa com dados cadastrais, acadêmicos, área atual, área final, vaga e rotações dos participantes correspondentes.
+  - propertyName: quantidade
+action:
+  kind: InvokeFlowTaskAction
+  flowId: f8f3d540-83ba-f111-aaad-6045bd0036df
+  connectionProperties:
+    $kind: ConnectionProperties
+    diagnostics:
+    mode: Invoker
+outputMode: All

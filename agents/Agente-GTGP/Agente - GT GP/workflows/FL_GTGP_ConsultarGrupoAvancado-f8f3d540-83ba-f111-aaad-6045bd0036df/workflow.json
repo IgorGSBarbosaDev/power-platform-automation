@@ -1,0 +1,553 @@
+﻿{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness": {
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "cr200_sharedexcelonlinebusiness_88165"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "FiltrosJson": {
+                  "description": "JSON com dois ou mais crit\u00E9rios expl\u00EDcitos. Use CEO3/CEO4/CEO5 para \u00E1rea atual, AreaFimCEO1..5 para destino, STEM para Classificacao_STEM. S\u00F3 inclua Programa quando houver men\u00E7\u00E3o expl\u00EDcita a GT, GP, Global Trainee ou Global Professional. Trainee/participante sozinho n\u00E3o define Programa.",
+                  "title": "FiltrosJson",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "required": []
+            }
+          },
+          "metadata": {
+            "operationMetadataId": "b8f61c18-7224-4f8a-9c5f-72fbce5df764"
+          }
+        }
+      },
+      "actions": {
+        "Interpretar_FiltrosJson": {
+          "type": "ParseJson",
+          "inputs": {
+            "content": "@triggerBody()?[\u0027FiltrosJson\u0027]",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Programa": {
+                  "type": "string"
+                },
+                "Status": {
+                  "type": "string"
+                },
+                "Enquadre": {
+                  "type": "string"
+                },
+                "GeracaoGT": {
+                  "type": "string"
+                },
+                "GeracaoGP": {
+                  "type": "string"
+                },
+                "CEO1": {
+                  "type": "string"
+                },
+                "CEO2": {
+                  "type": "string"
+                },
+                "CEO3": {
+                  "type": "string"
+                },
+                "CEO4": {
+                  "type": "string"
+                },
+                "CEO5": {
+                  "type": "string"
+                },
+                "Localidade": {
+                  "type": "string"
+                },
+                "Cargo": {
+                  "type": "string"
+                },
+                "IndustrialStaff": {
+                  "type": "string"
+                },
+                "AreaFimCEO1": {
+                  "type": "string"
+                },
+                "AreaFimCEO2": {
+                  "type": "string"
+                },
+                "AreaFimCEO3": {
+                  "type": "string"
+                },
+                "AreaFimCEO4": {
+                  "type": "string"
+                },
+                "AreaFimCEO5": {
+                  "type": "string"
+                },
+                "STEM": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "runAfter": {}
+        },
+        "Responder_Json_Invalido": {
+          "type": "Response",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "title": "status",
+                  "description": "sucesso, nao_encontrado ou filtro_obrigatorio",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "resultado": {
+                  "title": "resultado",
+                  "description": "Lista completa dos participantes correspondentes em formato JSON.",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "quantidade": {
+                  "title": "quantidade",
+                  "description": "Quantidade de participantes correspondentes.",
+                  "type": "number",
+                  "x-ms-content-hint": "NUMBER",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "additionalProperties": {}
+            },
+            "statusCode": 200,
+            "body": {
+              "status": "filtro_obrigatorio",
+              "resultado": "[]",
+              "quantidade": 0
+            }
+          },
+          "runAfter": {
+            "Interpretar_FiltrosJson": [
+              "Failed",
+              "TimedOut"
+            ]
+          }
+        },
+        "Normalizar_Filtros": {
+          "type": "Compose",
+          "inputs": {
+            "Programa": "@if(equals(toUpper(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027Programa\u0027], \u0027\u0027))), \u0027GT\u0027), \u0027Global Trainee\u0027, if(equals(toUpper(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027Programa\u0027], \u0027\u0027))), \u0027GP\u0027), \u0027Global Professional\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027Programa\u0027], \u0027\u0027))))",
+            "Status": "@trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027Status\u0027], \u0027\u0027))",
+            "Enquadre": "@trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027Enquadre\u0027], \u0027\u0027))",
+            "GeracaoGT": "@trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027GeracaoGT\u0027], \u0027\u0027))",
+            "GeracaoGP": "@trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027GeracaoGP\u0027], \u0027\u0027))",
+            "CEO1": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO1\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO1\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO1\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO1\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO1\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO1\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO1\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO1\u0027], \u0027\u0027))))",
+            "CEO2": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO2\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO2\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO2\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO2\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO2\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO2\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO2\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO2\u0027], \u0027\u0027))))",
+            "CEO3": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO3\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO3\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO3\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO3\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO3\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO3\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO3\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO3\u0027], \u0027\u0027))))",
+            "CEO4": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO4\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO4\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO4\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO4\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO4\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO4\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO4\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO4\u0027], \u0027\u0027))))",
+            "CEO5": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO5\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO5\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO5\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO5\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO5\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO5\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO5\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027CEO5\u0027], \u0027\u0027))))",
+            "Localidade": "@trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027Localidade\u0027], \u0027\u0027))",
+            "Cargo": "@trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027Cargo\u0027], \u0027\u0027))",
+            "IndustrialStaff": "@trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027IndustrialStaff\u0027], \u0027\u0027))",
+            "AreaFimCEO1": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO1\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO1\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO1\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO1\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO1\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO1\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO1\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO1\u0027], \u0027\u0027))))",
+            "AreaFimCEO2": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO2\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO2\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO2\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO2\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO2\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO2\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO2\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO2\u0027], \u0027\u0027))))",
+            "AreaFimCEO3": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO3\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO3\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO3\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO3\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO3\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO3\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO3\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO3\u0027], \u0027\u0027))))",
+            "AreaFimCEO4": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO4\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO4\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO4\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO4\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO4\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO4\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO4\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO4\u0027], \u0027\u0027))))",
+            "AreaFimCEO5": "@if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO5\u0027], \u0027\u0027))), \u0027rh\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO5\u0027], \u0027\u0027))), \u0027recursos humanos\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO5\u0027], \u0027\u0027))), \u0027hr\u0027)), \u0027Human Resources\u0027, if(or(equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO5\u0027], \u0027\u0027))), \u0027ti\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO5\u0027], \u0027\u0027))), \u0027t.i.\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO5\u0027], \u0027\u0027))), \u0027tecnologia da informa\u00E7\u00E3o\u0027), equals(toLower(trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO5\u0027], \u0027\u0027))), \u0027it\u0027)), \u0027Information Technology\u0027, trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027AreaFimCEO5\u0027], \u0027\u0027))))",
+            "STEM": "@trim(coalesce(body(\u0027Interpretar_FiltrosJson\u0027)?[\u0027STEM\u0027], \u0027\u0027))"
+          },
+          "runAfter": {
+            "Interpretar_FiltrosJson": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Construir_Filtro_Bruto": {
+          "type": "Compose",
+          "inputs": [
+            {
+              "campo": "Programa_Vigente",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027Programa\u0027]"
+            },
+            {
+              "campo": "Status_Trainee",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027Status\u0027]"
+            },
+            {
+              "campo": "Enquadre",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027Enquadre\u0027]"
+            },
+            {
+              "campo": "Geracao_GT",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027GeracaoGT\u0027]"
+            },
+            {
+              "campo": "Geracao_GP",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027GeracaoGP\u0027]"
+            },
+            {
+              "campo": "Area_Fim_CEO1",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027CEO1\u0027]"
+            },
+            {
+              "campo": "Area_Fim_CEO2",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027CEO2\u0027]"
+            },
+            {
+              "campo": "CEO3_Atual",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027CEO3\u0027]"
+            },
+            {
+              "campo": "CEO4_Atual",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027CEO4\u0027]"
+            },
+            {
+              "campo": "CEO5_Atual",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027CEO5\u0027]"
+            },
+            {
+              "campo": "Localidade",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027Localidade\u0027]"
+            },
+            {
+              "campo": "DescricaoCargo",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027Cargo\u0027]"
+            },
+            {
+              "campo": "Industrial_Staff",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027IndustrialStaff\u0027]"
+            },
+            {
+              "campo": "Area_Fim_CEO1",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027AreaFimCEO1\u0027]"
+            },
+            {
+              "campo": "Area_Fim_CEO2",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027AreaFimCEO2\u0027]"
+            },
+            {
+              "campo": "Area_Fim_CEO3",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027AreaFimCEO3\u0027]"
+            },
+            {
+              "campo": "Area_Fim_CEO4",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027AreaFimCEO4\u0027]"
+            },
+            {
+              "campo": "Area_Fim_CEO5",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027AreaFimCEO5\u0027]"
+            },
+            {
+              "campo": "Classificacao_STEM",
+              "valor": "@outputs(\u0027Normalizar_Filtros\u0027)?[\u0027STEM\u0027]"
+            }
+          ],
+          "runAfter": {
+            "Normalizar_Filtros": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Consultar_Somente_Com_Filtro": {
+          "type": "If",
+          "expression": {
+            "equals": [
+              "@length(body(\u0027Filtrar_Criterios_Ativos\u0027))",
+              0
+            ]
+          },
+          "actions": {
+            "Responder_Filtro_Obrigatorio": {
+              "type": "Response",
+              "kind": "Skills",
+              "inputs": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "title": "status",
+                      "description": "sucesso, nao_encontrado ou filtro_obrigatorio",
+                      "type": "string",
+                      "x-ms-content-hint": "TEXT",
+                      "x-ms-dynamically-added": true
+                    },
+                    "resultado": {
+                      "title": "resultado",
+                      "description": "Lista completa dos participantes correspondentes em formato JSON.",
+                      "type": "string",
+                      "x-ms-content-hint": "TEXT",
+                      "x-ms-dynamically-added": true
+                    },
+                    "quantidade": {
+                      "title": "quantidade",
+                      "description": "Quantidade de participantes correspondentes.",
+                      "type": "number",
+                      "x-ms-content-hint": "NUMBER",
+                      "x-ms-dynamically-added": true
+                    }
+                  },
+                  "additionalProperties": {}
+                },
+                "statusCode": 200,
+                "body": {
+                  "status": "filtro_obrigatorio",
+                  "resultado": "[]",
+                  "quantidade": 0
+                }
+              },
+              "runAfter": {}
+            }
+          },
+          "else": {
+            "actions": {
+              "Preparar_Filtro_OData": {
+                "type": "Compose",
+                "inputs": "@concat(\u0027contains(\u0027, first(body(\u0027Filtrar_Criterios_Ativos\u0027))?[\u0027campo\u0027], \u0027,\u0027\u0027\u0027, replace(first(body(\u0027Filtrar_Criterios_Ativos\u0027))?[\u0027valor\u0027], \u0027\u0027\u0027\u0027, \u0027\u0027\u0027\u0027\u0027\u0027), \u0027\u0027\u0027)\u0027)",
+                "runAfter": {}
+              },
+              "Listar_Linhas_GTGP": {
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "parameters": {
+                    "source": "groups/d3ca1904-1a69-4a6f-a6c6-b8473fa98a54",
+                    "drive": "b!lMd-qKD81UKhxH_CWtN0oZdjDya1bPhAqCawCBjCpNA_nShNGg0STr1IEJzcoTjP",
+                    "file": "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D",
+                    "table": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}",
+                    "$filter": "@outputs(\u0027Preparar_Filtro_OData\u0027)",
+                    "$select": "Matricula,Nome,DescricaoCargo,Programa_Vigente,Status_Trainee,Enquadre,Geracao_GT,Geracao_GP,Industrial_Staff,Curso,Instituicao,Classificacao_STEM,Previsao_de_Formatura,CEO3_Atual,CEO4_Atual,CEO5_Atual,Area_Fim_CEO1,Area_Fim_CEO2,Area_Fim_CEO3,Area_Fim_CEO4,Area_Fim_CEO5,Detalhe_Vaga,Rotacao1,Rotacao2,Rotacao3,Rotacao4,Vaga_Mapeada,Localidade"
+                  },
+                  "host": {
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+                    "operationId": "GetItems",
+                    "connectionName": "shared_excelonlinebusiness"
+                  }
+                },
+                "runAfter": {
+                  "Preparar_Filtro_OData": [
+                    "Succeeded"
+                  ]
+                },
+                "runtimeConfiguration": {
+                  "paginationPolicy": {
+                    "minimumItemCount": 100000
+                  }
+                },
+                "metadata": {
+                  "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D": "/Canal Talent Development/Programas GT e GP/Base/Base GTGP.xlsx",
+                  "tableId": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}"
+                }
+              },
+              "Selecionar_Resultado": {
+                "type": "Select",
+                "inputs": {
+                  "from": "@variables(\u0027LinhasFiltradas\u0027)",
+                  "select": {
+                    "Matricula": "@item()?[\u0027Matricula\u0027]",
+                    "Nome": "@item()?[\u0027Nome\u0027]",
+                    "Cargo": "@item()?[\u0027DescricaoCargo\u0027]",
+                    "Programa": "@item()?[\u0027Programa_Vigente\u0027]",
+                    "Status": "@item()?[\u0027Status_Trainee\u0027]",
+                    "Enquadre": "@item()?[\u0027Enquadre\u0027]",
+                    "GeracaoGT": "@item()?[\u0027Geracao_GT\u0027]",
+                    "GeracaoGP": "@item()?[\u0027Geracao_GP\u0027]",
+                    "IndustrialStaff": "@item()?[\u0027Industrial_Staff\u0027]",
+                    "Curso": "@item()?[\u0027Curso\u0027]",
+                    "Instituicao": "@item()?[\u0027Instituicao\u0027]",
+                    "Classificacao_STEM": "@item()?[\u0027Classificacao_STEM\u0027]",
+                    "Previsao_de_Formatura": "@item()?[\u0027Previsao_de_Formatura\u0027]",
+                    "CEO3_Atual": "@item()?[\u0027CEO3_Atual\u0027]",
+                    "CEO4_Atual": "@item()?[\u0027CEO4_Atual\u0027]",
+                    "CEO5_Atual": "@item()?[\u0027CEO5_Atual\u0027]",
+                    "Area_Fim_CEO1": "@item()?[\u0027Area_Fim_CEO1\u0027]",
+                    "Area_Fim_CEO2": "@item()?[\u0027Area_Fim_CEO2\u0027]",
+                    "Area_Fim_CEO3": "@item()?[\u0027Area_Fim_CEO3\u0027]",
+                    "Area_Fim_CEO4": "@item()?[\u0027Area_Fim_CEO4\u0027]",
+                    "Area_Fim_CEO5": "@item()?[\u0027Area_Fim_CEO5\u0027]",
+                    "Detalhe_Vaga": "@item()?[\u0027Detalhe_Vaga\u0027]",
+                    "Rotacao1": "@item()?[\u0027Rotacao1\u0027]",
+                    "Rotacao2": "@item()?[\u0027Rotacao2\u0027]",
+                    "Rotacao3": "@item()?[\u0027Rotacao3\u0027]",
+                    "Rotacao4": "@item()?[\u0027Rotacao4\u0027]",
+                    "Vaga_Mapeada": "@item()?[\u0027Vaga_Mapeada\u0027]",
+                    "Localidade": "@item()?[\u0027Localidade\u0027]"
+                  }
+                },
+                "runAfter": {
+                  "Aplicar_Filtros": [
+                    "Succeeded"
+                  ]
+                }
+              },
+              "Respond_to_the_agent": {
+                "type": "Response",
+                "kind": "Skills",
+                "inputs": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "title": "status",
+                        "description": "sucesso, nao_encontrado ou filtro_obrigatorio",
+                        "type": "string",
+                        "x-ms-content-hint": "TEXT",
+                        "x-ms-dynamically-added": true
+                      },
+                      "resultado": {
+                        "title": "resultado",
+                        "description": "Lista completa dos participantes correspondentes em formato JSON.",
+                        "type": "string",
+                        "x-ms-content-hint": "TEXT",
+                        "x-ms-dynamically-added": true
+                      },
+                      "quantidade": {
+                        "title": "quantidade",
+                        "description": "Quantidade de participantes correspondentes.",
+                        "type": "number",
+                        "x-ms-content-hint": "NUMBER",
+                        "x-ms-dynamically-added": true
+                      }
+                    },
+                    "additionalProperties": {}
+                  },
+                  "statusCode": 200,
+                  "body": {
+                    "status": "@{if(equals(length(body(\u0027Selecionar_Resultado\u0027)), 0), \u0027nao_encontrado\u0027, \u0027sucesso\u0027)}",
+                    "resultado": "@{string(body(\u0027Selecionar_Resultado\u0027))}",
+                    "quantidade": "@length(body(\u0027Selecionar_Resultado\u0027))"
+                  }
+                },
+                "runAfter": {
+                  "Selecionar_Resultado": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "81c94f73-dd52-465c-ad3b-a4686da63cc3"
+                }
+              },
+              "Guardar_Linhas_Excel": {
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "LinhasFiltradas",
+                  "value": "@coalesce(body(\u0027Listar_Linhas_GTGP\u0027)?[\u0027value\u0027], json(\u0027[]\u0027))"
+                },
+                "runAfter": {
+                  "Listar_Linhas_GTGP": [
+                    "Succeeded"
+                  ]
+                }
+              },
+              "Aplicar_Filtros": {
+                "type": "Foreach",
+                "foreach": "@body(\u0027Filtrar_Criterios_Ativos\u0027)",
+                "actions": {
+                  "Filtrar_Linhas_Por_Criterio": {
+                    "type": "Query",
+                    "inputs": {
+                      "from": "@variables(\u0027LinhasFiltradas\u0027)",
+                      "where": "@contains(toLower(string(coalesce(item()?[items(\u0027Aplicar_Filtros\u0027)?[\u0027campo\u0027]], \u0027\u0027))), toLower(string(items(\u0027Aplicar_Filtros\u0027)?[\u0027valor\u0027])))"
+                    },
+                    "runAfter": {}
+                  },
+                  "Atualizar_Linhas_Filtradas": {
+                    "type": "SetVariable",
+                    "inputs": {
+                      "name": "LinhasFiltradas",
+                      "value": "@body(\u0027Filtrar_Linhas_Por_Criterio\u0027)"
+                    },
+                    "runAfter": {
+                      "Filtrar_Linhas_Por_Criterio": [
+                        "Succeeded"
+                      ]
+                    }
+                  }
+                },
+                "runAfter": {
+                  "Guardar_Linhas_Excel": [
+                    "Succeeded"
+                  ]
+                },
+                "runtimeConfiguration": {
+                  "concurrency": {
+                    "repetitions": 1
+                  }
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Inicializar_Linhas_Filtradas": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Filtrar_Criterios_Ativos": {
+          "type": "Query",
+          "inputs": {
+            "from": "@outputs(\u0027Construir_Filtro_Bruto\u0027)",
+            "where": "@not(empty(item()?[\u0027valor\u0027]))"
+          },
+          "runAfter": {
+            "Construir_Filtro_Bruto": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Inicializar_Linhas_Filtradas": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "LinhasFiltradas",
+                "type": "array",
+                "value": []
+              }
+            ]
+          },
+          "runAfter": {
+            "Filtrar_Criterios_Ativos": [
+              "Succeeded"
+            ]
+          }
+        }
+      },
+      "outputs": {},
+      "description": "Consulta populacional GT/GP a partir de FiltrosJson, combinando somente os crit\u00E9rios presentes com AND.",
+      "metadata": {
+        "defaultToEmbeddedConnections": true
+      }
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}
