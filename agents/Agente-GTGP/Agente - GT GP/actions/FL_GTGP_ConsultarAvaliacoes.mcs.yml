@@ -6,61 +6,31 @@ inputs:
     propertyName: text
     name: Critério de busca
     description: |-
-      Define como localizar o colaborador ou grupo.
-
-      Valores permitidos:
-      Nome, Matricula, CEO1, CEO2, CEO3, CEO4, CEO5, CEO6, CEO7, Programa, Status, Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo ou IndustrialStaff.
-
-      Regras:
-      - Para uma pessoa identificada pelo nome, use Nome.
-      - Para matrícula, use Matricula.
-      - Quando o usuário informar explicitamente CEO1, CEO2, CEO3, CEO4, CEO5, CEO6 ou CEO7, use exatamente o nível informado.
-      - Para programa GT/GP, use Programa.
-      - Para Pool RH ou Área, use Status.
-      - Para enquadramentos como GP3, use Enquadre.
-      - Para geração, use GeracaoGT ou GeracaoGP.
-      - Para localidade, use Localidade.
-      - Para cargo, use Cargo.
-      - Para Industrial ou Staff, use IndustrialStaff.
+      Use Nome ou Matricula para identificar uma pessoa. Esta ferramenta
+      atende somente a avaliação de um ciclo explicitamente informado.
 
   - kind: AutomaticTaskInput
     propertyName: text_1
     name: Valor da busca
-    description: |-
-      Valor que deve ser pesquisado no critério selecionado.
+    description: Valor a pesquisar no critério escolhido; nome pode ser parcial e matrícula deve ser integral.
 
-      Extraia somente o nome, matrícula, área, programa, enquadramento, geração, localidade ou outro valor solicitado.
-
-      Exemplos:
-      "avaliações da Anna Clara" → Anna Clara
-      "avaliações da matrícula 60010419" → 60010419
-      "avaliações de todos os GP3" → GP3
-      "avaliações de todos de Belo Horizonte" → Belo Horizonte
-
-      Quando houver nomenclatura corporativa conhecida, use o valor cadastrado na base.
-      Exemplo:
-      RH / Recursos Humanos / HR → Human Resources
-      TI / Tecnologia da Informação / IT → Information Technology
+  - kind: AutomaticTaskInput
+    propertyName: text_2
+    name: Ciclo específico
+    description: Informe o ciclo exato solicitado, no formato AAAA.S, como 2026.1. Para histórico ou última avaliação sem ciclo, use ConsultarHistoricoAvaliacoes.
 
 modelDisplayName: Consultar avaliações GT/GP
 modelDescription: |-
-  Consulta o histórico de avaliações de um ou mais colaboradores dos programas GT/GP.
-
-  Use esta ferramenta sempre que o usuário perguntar sobre avaliação, avaliações, performance, desempenho, nota, potencial, última avaliação ou histórico de avaliações.
-
-  A ferramenta pode consultar:
-  - um colaborador específico por nome ou matrícula;
-  - grupos de colaboradores por CEO, programa, status, enquadramento, geração, localidade, cargo ou Industrial/Staff.
-
-  Sempre considere Nota e Potencial como partes da mesma avaliação. Quando houver mais de um ciclo, utilize os dados retornados para identificar o histórico ou a avaliação mais recente conforme solicitado.
+  Consulta a nota e o potencial de uma pessoa GT/GP em um ciclo específico explicitamente solicitado. Identifique por nome ou matrícula e informe o ciclo no formato AAAA.S. Para histórico completo, evolução ou última avaliação sem ciclo, use ConsultarHistoricoAvaliacoes. Para encontrar pessoas por nota ou potencial, use FiltrarAvaliacoes. Dados restritos nunca são expostos.
 outputs:
   - propertyName: status
-    description: Indica o resultado da consulta de avaliações. Retorna encontrado quando houver pelo menos um colaborador com resultado, ou nao_encontrado quando nenhum colaborador corresponder ao filtro informado.
+    description: encontrado, nao_encontrado, multiplos, restrita, sem_avaliacao, ciclo_inexistente ou ciclo_invalido.
 
   - propertyName: resultado
-    description: Quantidade total de colaboradores encontrados na consulta de avaliações.
+    description: JSON serializado com NotaCiclo e PotencialCiclo autorizados, ou candidatos mínimos quando o nome for ambíguo. O caminho legado sem ciclo mantém a saída consolidada.
 
   - propertyName: quantidade
+    description: Quantidade numérica de colaboradores encontrados. É uma contagem; os dados dos registros estão em resultado.
 
 action:
   kind: InvokeFlowTaskAction

@@ -36,7 +36,7 @@
               "type": "object",
               "properties": {
                 "text": {
-                  "description": "Crit\u00E9rio pelo qual o grupo deve ser filtrado. Valores permitidos: CEO1, CEO2, CEO3, CEO4, CEO5, CEO6, CEO7, Programa, Status, Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo ou IndustrialStaff.",
+                  "description": "Crit\u00E9rio coletivo. Use CEO3, CEO4 ou CEO5 para \u00E1rea atual; AreaFimCEO1 a AreaFimCEO5 para destino; Programa somente quando GT/GP for expl\u00EDcito. Outros valores: Status, Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo, IndustrialStaff ou STEM.",
                   "title": "campo",
                   "type": "string",
                   "x-ms-content-hint": "TEXT",
@@ -134,7 +134,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaFiltro",
-                    "value": "DescricaoCEO1"
+                    "value": "Area_Fim_CEO1"
                   }
                 }
               },
@@ -146,7 +146,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaFiltro",
-                    "value": "DescricaoCEO3"
+                    "value": "CEO3_Atual"
                   }
                 }
               },
@@ -158,7 +158,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaFiltro",
-                    "value": "DescricaoCEO4"
+                    "value": "CEO4_Atual"
                   }
                 }
               },
@@ -170,7 +170,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaFiltro",
-                    "value": "DescricaoCEO5"
+                    "value": "CEO5_Atual"
                   }
                 }
               },
@@ -183,6 +183,18 @@
                   "inputs": {
                     "name": "ColunaFiltro",
                     "value": "Programa_Vigente"
+                  }
+                },
+                "Definir_vari\u00E1vel_12": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ValorFiltro",
+                    "value": "@if(\r\n    equals(toUpper(trim(triggerBody()?[\u0027text_1\u0027])), \u0027GT\u0027),\r\n    \u0027Global Trainee\u0027,\r\n    if(\r\n        equals(toUpper(trim(triggerBody()?[\u0027text_1\u0027])), \u0027GP\u0027),\r\n        \u0027Global Professional\u0027,\r\n        triggerBody()?[\u0027text_1\u0027]\r\n    )\r\n)"
+                  },
+                  "runAfter": {
+                    "Definir_vari\u00E1vel_4": [
+                      "SUCCEEDED"
+                    ]
                   }
                 }
               },
@@ -271,6 +283,90 @@
                 }
               },
               "case": "Enquadre"
+            },
+            "CEO2": {
+              "actions": {
+                "Definir_CEO2": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO2"
+                  }
+                }
+              },
+              "case": "CEO2"
+            },
+            "STEM": {
+              "actions": {
+                "Definir_STEM": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Classificacao_STEM"
+                  }
+                }
+              },
+              "case": "STEM"
+            },
+            "AreaFimCEO1": {
+              "actions": {
+                "Definir_AreaFimCEO1": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO1"
+                  }
+                }
+              },
+              "case": "AreaFimCEO1"
+            },
+            "AreaFimCEO2": {
+              "actions": {
+                "Definir_AreaFimCEO2": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO2"
+                  }
+                }
+              },
+              "case": "AreaFimCEO2"
+            },
+            "AreaFimCEO3": {
+              "actions": {
+                "Definir_AreaFimCEO3": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO3"
+                  }
+                }
+              },
+              "case": "AreaFimCEO3"
+            },
+            "AreaFimCEO4": {
+              "actions": {
+                "Definir_AreaFimCEO4": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO4"
+                  }
+                }
+              },
+              "case": "AreaFimCEO4"
+            },
+            "AreaFimCEO5": {
+              "actions": {
+                "Definir_AreaFimCEO5": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO5"
+                  }
+                }
+              },
+              "case": "AreaFimCEO5"
             }
           },
           "runAfter": {
@@ -314,7 +410,7 @@
               "file": "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D",
               "table": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}",
               "$filter": "@outputs(\u0027FiltroOData\u0027)",
-              "$select": "Matricula,Nome,DescricaoCargo,Programa_Vigente,Status_Trainee,Enquadre,Geracao_GT,Geracao_GP,DescricaoCEO3,DescricaoCEO4,DescricaoCEO5,Localidade"
+              "$select": "Matricula,Nome,DescricaoCargo,Programa_Vigente,Status_Trainee,Enquadre,Geracao_GT,Geracao_GP,Industrial_Staff,Curso,Instituicao,Classificacao_STEM,Previsao_de_Formatura,CEO3_Atual,CEO4_Atual,CEO5_Atual,Area_Fim_CEO1,Area_Fim_CEO2,Area_Fim_CEO3,Area_Fim_CEO4,Area_Fim_CEO5,Detalhe_Vaga,Rotacao1,Rotacao2,Rotacao3,Rotacao4,Vaga_Mapeada,Localidade"
             },
             "host": {
               "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
@@ -350,10 +446,26 @@
               "Enquadre": "@item()?[\u0027Enquadre\u0027]",
               "GeracaoGT": "@item()?[\u0027Geracao_GT\u0027]",
               "GeracaoGP": "@item()?[\u0027Geracao_GP\u0027]",
-              "CEO3": "@item()?[\u0027DescricaoCEO3\u0027]",
-              "CEO4": "@item()?[\u0027DescricaoCEO4\u0027]",
-              "Localidade": "@item()?[\u0027Localidade\u0027]",
-              "CEO1": "@item()?[\u0027DescricaoCEO1\u0027]"
+              "IndustrialStaff": "@item()?[\u0027Industrial_Staff\u0027]",
+              "Curso": "@item()?[\u0027Curso\u0027]",
+              "Instituicao": "@item()?[\u0027Instituicao\u0027]",
+              "Classificacao_STEM": "@item()?[\u0027Classificacao_STEM\u0027]",
+              "Previsao_de_Formatura": "@item()?[\u0027Previsao_de_Formatura\u0027]",
+              "CEO3_Atual": "@item()?[\u0027CEO3_Atual\u0027]",
+              "CEO4_Atual": "@item()?[\u0027CEO4_Atual\u0027]",
+              "CEO5_Atual": "@item()?[\u0027CEO5_Atual\u0027]",
+              "Area_Fim_CEO1": "@item()?[\u0027Area_Fim_CEO1\u0027]",
+              "Area_Fim_CEO2": "@item()?[\u0027Area_Fim_CEO2\u0027]",
+              "Area_Fim_CEO3": "@item()?[\u0027Area_Fim_CEO3\u0027]",
+              "Area_Fim_CEO4": "@item()?[\u0027Area_Fim_CEO4\u0027]",
+              "Area_Fim_CEO5": "@item()?[\u0027Area_Fim_CEO5\u0027]",
+              "Detalhe_Vaga": "@item()?[\u0027Detalhe_Vaga\u0027]",
+              "Rotacao1": "@item()?[\u0027Rotacao1\u0027]",
+              "Rotacao2": "@item()?[\u0027Rotacao2\u0027]",
+              "Rotacao3": "@item()?[\u0027Rotacao3\u0027]",
+              "Rotacao4": "@item()?[\u0027Rotacao4\u0027]",
+              "Vaga_Mapeada": "@item()?[\u0027Vaga_Mapeada\u0027]",
+              "Localidade": "@item()?[\u0027Localidade\u0027]"
             }
           },
           "runAfter": {

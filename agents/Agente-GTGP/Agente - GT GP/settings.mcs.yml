@@ -13,7 +13,6 @@ configuration:
     GenerativeActionsEnabled: true
 
   isAgentConnectable: true
-  publishOnCreate: false
   publishOnImport: true
   gPTSettings:
     defaultSchemaName: cr200_AgenteGTGP.gpt.default
@@ -31,6 +30,6 @@ configuration:
 
   deferredProvisioning: false
 
-publishedOn: 2026-09-08T02:04:51.0000000Z
+publishedOn: 2026-10-07T21:41:04.0000000Z
 template: default-2.1.0
 language: 1046

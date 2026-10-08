@@ -54,7 +54,7 @@
       "actions": {
         "Respond_to_the_agent": {
           "runAfter": {
-            "Matriz_do_filtro": [
+            "Projetar_Perfil": [
               "Succeeded"
             ]
           },
@@ -87,7 +87,7 @@
             "statusCode": 200,
             "body": {
               "status": "@{if(\r\n  equals(length(body(\u0027Matriz_do_filtro\u0027)), 0),\r\n  \u0027nao_encontrado\u0027,\r\n  if(\r\n    equals(length(body(\u0027Matriz_do_filtro\u0027)), 1),\r\n    \u0027encontrado\u0027,\r\n    \u0027multiplos\u0027\r\n  )\r\n)}",
-              "resultado": "@{string(body(\u0027Matriz_do_filtro\u0027))}"
+              "resultado": "@{string(body(\u0027Projetar_Perfil\u0027))}"
             }
           }
         },
@@ -122,6 +122,56 @@
           "inputs": {
             "from": "@outputs(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027body/value\u0027]",
             "where": "@or(\n  equals(\n    string(item()?[\u0027Matricula\u0027]),\n    trim(triggerBody()?[\u0027text\u0027])\n  ),\n  contains(\n    toLower(string(item()?[\u0027Nome\u0027])),\n    toLower(trim(triggerBody()?[\u0027text\u0027]))\n  )\n)"
+          }
+        },
+        "Projetar_Perfil": {
+          "runAfter": {
+            "Matriz_do_filtro": [
+              "Succeeded"
+            ]
+          },
+          "type": "Select",
+          "inputs": {
+            "from": "@body(\u0027Matriz_do_filtro\u0027)",
+            "select": {
+              "DataEfetivo": "@item()?[\u0027DataEfetivo\u0027]",
+              "Matricula": "@item()?[\u0027Matricula\u0027]",
+              "Nome": "@item()?[\u0027Nome\u0027]",
+              "DescricaoCargo": "@item()?[\u0027DescricaoCargo\u0027]",
+              "Idade": "@item()?[\u0027Idade\u0027]",
+              "Sexo": "@item()?[\u0027Sexo\u0027]",
+              "Programa Vigente": "@item()?[\u0027Programa Vigente\u0027]",
+              "Enquadre": "@item()?[\u0027Enquadre\u0027]",
+              "Status Trainee": "@item()?[\u0027Status Trainee\u0027]",
+              "Industrial/Staff": "@item()?[\u0027Industrial/Staff\u0027]",
+              "DataAdmissao": "@item()?[\u0027DataAdmissao\u0027]",
+              "Gera\u00E7\u00E3o GT": "@item()?[\u0027Gera\u00E7\u00E3o GT\u0027]",
+              "Gera\u00E7\u00E3o GP": "@item()?[\u0027Gera\u00E7\u00E3o GP\u0027]",
+              "TempoCasa": "@item()?[\u0027TempoCasa\u0027]",
+              "Ra\u00E7a/Cor": "@item()?[\u0027Ra\u00E7a/Cor\u0027]",
+              "Curso": "@item()?[\u0027Curso\u0027]",
+              "Institui\u00E7\u00E3o": "@item()?[\u0027Institui\u00E7\u00E3o\u0027]",
+              "Classificacao_STEM": "@item()?[\u0027Classificacao_STEM\u0027]",
+              "Previs\u00E3o de Formatura": "@item()?[\u0027Previs\u00E3o de Formatura\u0027]",
+              "Area-Fim-CEO1": "@item()?[\u0027Area-Fim-CEO1\u0027]",
+              "Area-Fim-CEO2": "@item()?[\u0027Area-Fim-CEO2\u0027]",
+              "Area-Fim-CEO3": "@item()?[\u0027Area-Fim-CEO3\u0027]",
+              "Area-Fim-CEO4": "@item()?[\u0027Area-Fim-CEO4\u0027]",
+              "Area-Fim-CEO5": "@item()?[\u0027Area-Fim-CEO5\u0027]",
+              "CEO3-Atual": "@item()?[\u0027CEO3-Atual\u0027]",
+              "CEO4-Atual": "@item()?[\u0027CEO4-Atual\u0027]",
+              "CEO5-Atual": "@item()?[\u0027CEO5-Atual\u0027]",
+              "Detalhe Vaga": "@item()?[\u0027Detalhe Vaga\u0027]",
+              "Rota\u00E7\u00E3o1": "@item()?[\u0027Rota\u00E7\u00E3o1\u0027]",
+              "Rota\u00E7\u00E3o2": "@item()?[\u0027Rota\u00E7\u00E3o2\u0027]",
+              "Rota\u00E7\u00E3o3": "@item()?[\u0027Rota\u00E7\u00E3o3\u0027]",
+              "Rota\u00E7\u00E3o4": "@item()?[\u0027Rota\u00E7\u00E3o4\u0027]",
+              "Vaga Mapeada": "@item()?[\u0027Vaga Mapeada\u0027]",
+              "CentroCusto": "@item()?[\u0027CentroCusto\u0027]",
+              "DescricaoNivel1": "@item()?[\u0027DescricaoNivel1\u0027]",
+              "Nivel2": "@item()?[\u0027Nivel2\u0027]",
+              "Localidade": "@item()?[\u0027Localidade\u0027]"
+            }
           }
         }
       },

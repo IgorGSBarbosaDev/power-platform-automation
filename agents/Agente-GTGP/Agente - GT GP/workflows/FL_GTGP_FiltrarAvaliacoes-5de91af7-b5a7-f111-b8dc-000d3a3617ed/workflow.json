@@ -57,7 +57,7 @@
                   "x-ms-dynamically-added": true
                 },
                 "text_3": {
-                  "description": "Filtro de grupo opcional. Valores permitidos: CEO1, CEO2, CEO3, CEO4, CEO5, CEO6, CEO7, Programa, Status, Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo ou IndustrialStaff.",
+                  "description": "Filtro coletivo opcional: Nenhum, CEO3/CEO4/CEO5 (\u00E1rea atual), AreaFimCEO1..5 (destino), Programa, Status, Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo, IndustrialStaff ou STEM. Programa apenas se GT/GP for expl\u00EDcito.",
                   "title": "campoGrupo",
                   "type": "string",
                   "x-ms-content-hint": "TEXT",
@@ -95,21 +95,21 @@
               "properties": {
                 "status": {
                   "title": "status",
-                  "description": "Indica se foram encontrados colaboradores que atendem aos crit\u00E9rios de avalia\u00E7\u00E3o.",
+                  "description": "Indica se h\u00E1 registros retornados, inclusive participantes restritos sem correspond\u00EAncia de Nota/Potencial confirmada.",
                   "type": "string",
                   "x-ms-content-hint": "TEXT",
                   "x-ms-dynamically-added": true
                 },
                 "quantidade": {
                   "title": "quantidade",
-                  "description": "Quantidade total de colaboradores encontrados.",
+                  "description": "Quantidade de correspond\u00EAncias de Nota/Potencial confirmadas; registros restritos n\u00E3o entram nesta contagem.",
                   "type": "number",
                   "x-ms-content-hint": "NUMBER",
                   "x-ms-dynamically-added": true
                 },
                 "resultado": {
                   "title": "resultado",
-                  "description": "Cont\u00E9m todos os colaboradores encontrados, com Nome, Matr\u00EDcula, Enquadramento, Programa e dados de avalia\u00E7\u00E3o.",
+                  "description": "Registros confirmados e participantes restritos vis\u00EDveis sem dados de performance. Restritos n\u00E3o t\u00EAm correspond\u00EAncia de Nota/Potencial confirmada.",
                   "type": "string",
                   "x-ms-content-hint": "TEXT",
                   "x-ms-dynamically-added": true
@@ -119,14 +119,14 @@
             },
             "statusCode": 200,
             "body": {
-              "status": "@{if(\r\n    equals(length(body(\u0027Matriz_do_filtro\u0027)), 0),\r\n    \u0027nao_encontrado\u0027,\r\n    \u0027encontrado\u0027\r\n)}",
-              "quantidade": "@length(body(\u0027Matriz_do_filtro\u0027))",
-              "resultado": "@{string(body(\u0027Matriz_do_filtro\u0027))}"
+              "status": "@{if(equals(length(body(\u0027Selecionar_Resultado\u0027)),0),\u0027nao_encontrado\u0027,\u0027encontrado\u0027)}",
+              "quantidade": "@length(body(\u0027Correspondencias_Confirmadas\u0027))",
+              "resultado": "@{string(body(\u0027Selecionar_Resultado\u0027))}"
             }
           },
           "runAfter": {
-            "Matriz_do_filtro": [
-              "SUCCEEDED"
+            "Selecionar_Resultado": [
+              "Succeeded"
             ]
           },
           "metadata": {
@@ -226,7 +226,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaGrupo",
-                    "value": "DescricaoCEO1"
+                    "value": "Area_Fim_CEO1"
                   }
                 }
               },
@@ -238,7 +238,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaGrupo",
-                    "value": "DescricaoCEO3"
+                    "value": "CEO3_Atual"
                   }
                 }
               },
@@ -250,7 +250,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaGrupo",
-                    "value": "DescricaoCEO4"
+                    "value": "CEO4_Atual"
                   }
                 }
               },
@@ -262,7 +262,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaGrupo",
-                    "value": "DescricaoCEO5"
+                    "value": "CEO5_Atual"
                   }
                 }
               },
@@ -363,6 +363,90 @@
                 }
               },
               "case": "Enquadre"
+            },
+            "CEO2": {
+              "actions": {
+                "Definir_CEO2": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaGrupo",
+                    "value": "Area_Fim_CEO2"
+                  }
+                }
+              },
+              "case": "CEO2"
+            },
+            "STEM": {
+              "actions": {
+                "Definir_STEM": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaGrupo",
+                    "value": "Classificacao_STEM"
+                  }
+                }
+              },
+              "case": "STEM"
+            },
+            "AreaFimCEO1": {
+              "actions": {
+                "Definir_AreaFimCEO1": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaGrupo",
+                    "value": "Area_Fim_CEO1"
+                  }
+                }
+              },
+              "case": "AreaFimCEO1"
+            },
+            "AreaFimCEO2": {
+              "actions": {
+                "Definir_AreaFimCEO2": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaGrupo",
+                    "value": "Area_Fim_CEO2"
+                  }
+                }
+              },
+              "case": "AreaFimCEO2"
+            },
+            "AreaFimCEO3": {
+              "actions": {
+                "Definir_AreaFimCEO3": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaGrupo",
+                    "value": "Area_Fim_CEO3"
+                  }
+                }
+              },
+              "case": "AreaFimCEO3"
+            },
+            "AreaFimCEO4": {
+              "actions": {
+                "Definir_AreaFimCEO4": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaGrupo",
+                    "value": "Area_Fim_CEO4"
+                  }
+                }
+              },
+              "case": "AreaFimCEO4"
+            },
+            "AreaFimCEO5": {
+              "actions": {
+                "Definir_AreaFimCEO5": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaGrupo",
+                    "value": "Area_Fim_CEO5"
+                  }
+                }
+              },
+              "case": "AreaFimCEO5"
             }
           },
           "runAfter": {
@@ -388,8 +472,7 @@
               "drive": "b!lMd-qKD81UKhxH_CWtN0oZdjDya1bPhAqCawCBjCpNA_nShNGg0STr1IEJzcoTjP",
               "file": "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D",
               "table": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}",
-              "$filter": "@outputs(\u0027FiltroAvaliacao\u0027)",
-              "$select": "Matricula,Nome,Enquadre,Programa_Vigente,Status_Trainee,Geracao_GT,Geracao_GP,DescricaoCargo,DescricaoCEO1,DescricaoCEO2,DescricaoCEO3,DescricaoCEO4,DescricaoCEO5,DescricaoCEO6,DescricaoCEO7,Localidade,Industrial_Staff,HistoricoAvaliacoes,UltimoCicloAvaliacao,UltimaNota,UltimoPotencial"
+              "$select": "Matricula,Nome,DescricaoCargo,Programa_Vigente,Status_Trainee,Enquadre,Geracao_GT,Geracao_GP,Industrial_Staff,Curso,Instituicao,Classificacao_STEM,Previsao_de_Formatura,CEO3_Atual,CEO4_Atual,CEO5_Atual,Area_Fim_CEO1,Area_Fim_CEO2,Area_Fim_CEO3,Area_Fim_CEO4,Area_Fim_CEO5,Detalhe_Vaga,Rotacao1,Rotacao2,Rotacao3,Rotacao4,Vaga_Mapeada,Localidade,RestricaoPerformance,StatusAvaliacao,HistoricoAvaliacoes,UltimoCicloAvaliacao,UltimaNota,UltimoPotencial"
             },
             "host": {
               "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
@@ -404,7 +487,7 @@
           },
           "runtimeConfiguration": {
             "paginationPolicy": {
-              "minimumItemCount": 500
+              "minimumItemCount": 5000
             }
           },
           "metadata": {
@@ -415,11 +498,69 @@
           "type": "Query",
           "inputs": {
             "from": "@outputs(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027body/value\u0027]",
-            "where": "@and(\r\n    if(\r\n        equals(\r\n            toLower(trim(variables(\u0027ModoFiltro\u0027))),\r\n            \u0027ultima\u0027\r\n        ),\r\n        equals(\r\n            toUpper(string(item()?[\u0027UltimoPotencial\u0027])),\r\n            toUpper(trim(variables(\u0027PotencialFiltro\u0027)))\r\n        ),\r\n        true\r\n    ),\r\n    if(\r\n        empty(variables(\u0027ColunaGrupo\u0027)),\r\n        true,\r\n        contains(\r\n            toLower(string(item()?[variables(\u0027ColunaGrupo\u0027)])),\r\n            toLower(trim(variables(\u0027ValorGrupo\u0027)))\r\n        )\r\n    )\r\n)"
+            "where": "@and(if(empty(variables(\u0027ColunaGrupo\u0027)),true,contains(toLower(string(item()?[variables(\u0027ColunaGrupo\u0027)])),toLower(trim(variables(\u0027ValorGrupo\u0027))))),or(or(equals(toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))),\u0027sim\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027)),if(equals(toLower(trim(variables(\u0027ModoFiltro\u0027))),\u0027ultima\u0027),and(equals(string(item()?[\u0027UltimaNota\u0027]),trim(variables(\u0027NotaFiltro\u0027))),equals(toUpper(string(item()?[\u0027UltimoPotencial\u0027])),toUpper(trim(variables(\u0027PotencialFiltro\u0027))))),contains(toUpper(string(item()?[\u0027HistoricoAvaliacoes\u0027])),toUpper(concat(\u0027Nota: \u0027,trim(variables(\u0027NotaFiltro\u0027)),\u0027 | Potencial: \u0027,trim(variables(\u0027PotencialFiltro\u0027))))))))"
           },
           "runAfter": {
             "Listar_linhas_presentes_em_uma_tabela": [
               "SUCCEEDED"
+            ]
+          }
+        },
+        "Selecionar_Resultado": {
+          "type": "Select",
+          "inputs": {
+            "from": "@body(\u0027Matriz_do_filtro\u0027)",
+            "select": {
+              "Matricula": "@item()?[\u0027Matricula\u0027]",
+              "Nome": "@item()?[\u0027Nome\u0027]",
+              "Cargo": "@item()?[\u0027DescricaoCargo\u0027]",
+              "Programa": "@item()?[\u0027Programa_Vigente\u0027]",
+              "Status": "@item()?[\u0027Status_Trainee\u0027]",
+              "Enquadre": "@item()?[\u0027Enquadre\u0027]",
+              "GeracaoGT": "@item()?[\u0027Geracao_GT\u0027]",
+              "GeracaoGP": "@item()?[\u0027Geracao_GP\u0027]",
+              "IndustrialStaff": "@item()?[\u0027Industrial_Staff\u0027]",
+              "Curso": "@item()?[\u0027Curso\u0027]",
+              "Instituicao": "@item()?[\u0027Instituicao\u0027]",
+              "Classificacao_STEM": "@item()?[\u0027Classificacao_STEM\u0027]",
+              "Previsao_de_Formatura": "@item()?[\u0027Previsao_de_Formatura\u0027]",
+              "CEO3_Atual": "@item()?[\u0027CEO3_Atual\u0027]",
+              "CEO4_Atual": "@item()?[\u0027CEO4_Atual\u0027]",
+              "CEO5_Atual": "@item()?[\u0027CEO5_Atual\u0027]",
+              "Area_Fim_CEO1": "@item()?[\u0027Area_Fim_CEO1\u0027]",
+              "Area_Fim_CEO2": "@item()?[\u0027Area_Fim_CEO2\u0027]",
+              "Area_Fim_CEO3": "@item()?[\u0027Area_Fim_CEO3\u0027]",
+              "Area_Fim_CEO4": "@item()?[\u0027Area_Fim_CEO4\u0027]",
+              "Area_Fim_CEO5": "@item()?[\u0027Area_Fim_CEO5\u0027]",
+              "Detalhe_Vaga": "@item()?[\u0027Detalhe_Vaga\u0027]",
+              "Rotacao1": "@item()?[\u0027Rotacao1\u0027]",
+              "Rotacao2": "@item()?[\u0027Rotacao2\u0027]",
+              "Rotacao3": "@item()?[\u0027Rotacao3\u0027]",
+              "Rotacao4": "@item()?[\u0027Rotacao4\u0027]",
+              "Vaga_Mapeada": "@item()?[\u0027Vaga_Mapeada\u0027]",
+              "Localidade": "@item()?[\u0027Localidade\u0027]",
+              "StatusAvaliacao": "@if(or(equals(toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))),\u0027sim\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027)),\u0027Restrita\u0027,item()?[\u0027StatusAvaliacao\u0027])",
+              "HistoricoAvaliacoes": "@if(or(equals(toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))),\u0027sim\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027)),null,item()?[\u0027HistoricoAvaliacoes\u0027])",
+              "UltimoCicloAvaliacao": "@if(or(equals(toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))),\u0027sim\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027)),null,item()?[\u0027UltimoCicloAvaliacao\u0027])",
+              "UltimaNota": "@if(or(equals(toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))),\u0027sim\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027)),null,item()?[\u0027UltimaNota\u0027])",
+              "UltimoPotencial": "@if(or(equals(toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))),\u0027sim\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027)),null,item()?[\u0027UltimoPotencial\u0027])"
+            }
+          },
+          "runAfter": {
+            "Correspondencias_Confirmadas": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Correspondencias_Confirmadas": {
+          "type": "Query",
+          "inputs": {
+            "from": "@body(\u0027Matriz_do_filtro\u0027)",
+            "where": "@not(or(equals(toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))),\u0027sim\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027)))"
+          },
+          "runAfter": {
+            "Matriz_do_filtro": [
+              "Succeeded"
             ]
           }
         }

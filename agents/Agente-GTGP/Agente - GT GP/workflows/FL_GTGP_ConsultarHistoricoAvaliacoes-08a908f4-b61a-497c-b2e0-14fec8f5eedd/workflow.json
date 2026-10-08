@@ -1,0 +1,312 @@
+﻿{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness": {
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "cr200_sharedexcelonlinebusiness_88165"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "metadata": {
+        "defaultToEmbeddedConnections": true
+      },
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "Crit\u00E9rio de identifica\u00E7\u00E3o individual: Nome ou Matricula.",
+                  "title": "campo",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "text_1": {
+                  "description": "Nome completo ou parcial, ou matr\u00EDcula integral.",
+                  "title": "valor",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "required": [
+                "text",
+                "text_1"
+              ]
+            }
+          },
+          "metadata": {
+            "operationMetadataId": "68f10d56-4664-4b8d-b735-df3e223183c1"
+          }
+        }
+      },
+      "actions": {
+        "Campo_normalizado": {
+          "type": "Compose",
+          "inputs": "@toLower(trim(string(coalesce(triggerBody()?[\u0027text\u0027],\u0027\u0027))))",
+          "runAfter": {}
+        },
+        "Valor_normalizado": {
+          "type": "Compose",
+          "inputs": "@trim(string(coalesce(triggerBody()?[\u0027text_1\u0027],\u0027\u0027)))",
+          "runAfter": {
+            "Campo_normalizado": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Validar_Entrada": {
+          "type": "If",
+          "expression": "@and(or(equals(outputs(\u0027Campo_normalizado\u0027),\u0027nome\u0027),equals(outputs(\u0027Campo_normalizado\u0027),\u0027matricula\u0027)),not(empty(outputs(\u0027Valor_normalizado\u0027))))",
+          "actions": {
+            "Consultar_E_Responder": {
+              "type": "Scope",
+              "actions": {
+                "FiltroOData": {
+                  "type": "Compose",
+                  "inputs": "@if(equals(outputs(\u0027Campo_normalizado\u0027),\u0027matricula\u0027),concat(\u0027Matricula eq \u0027\u0027\u0027,replace(outputs(\u0027Valor_normalizado\u0027),\u0027\u0027\u0027\u0027,\u0027\u0027\u0027\u0027\u0027\u0027),\u0027\u0027\u0027\u0027),concat(\u0027contains(Nome,\u0027\u0027\u0027,replace(outputs(\u0027Valor_normalizado\u0027),\u0027\u0027\u0027\u0027,\u0027\u0027\u0027\u0027\u0027\u0027),\u0027\u0027\u0027)\u0027))",
+                  "runAfter": {}
+                },
+                "Listar_linhas_presentes_em_uma_tabela": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "source": "groups/d3ca1904-1a69-4a6f-a6c6-b8473fa98a54",
+                      "drive": "b!lMd-qKD81UKhxH_CWtN0oZdjDya1bPhAqCawCBjCpNA_nShNGg0STr1IEJzcoTjP",
+                      "file": "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D",
+                      "table": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}",
+                      "$filter": "@outputs(\u0027FiltroOData\u0027)",
+                      "$select": "Matricula,Nome,RestricaoPerformance,StatusAvaliacao,HistoricoAvaliacoes,UltimoCicloAvaliacao,UltimaNota,UltimoPotencial"
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+                      "operationId": "GetItems",
+                      "connectionName": "shared_excelonlinebusiness"
+                    }
+                  },
+                  "runAfter": {
+                    "FiltroOData": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D": "/Canal Talent Development/Programas GT e GP/Base/Base GTGP.xlsx",
+                    "tableId": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}",
+                    "operationMetadataId": "efab8863-ae2e-4c12-86af-54fa7d894b94"
+                  }
+                },
+                "Selecionar_Candidatos": {
+                  "type": "Select",
+                  "inputs": {
+                    "from": "@outputs(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027body/value\u0027]",
+                    "select": {
+                      "Matricula": "@item()?[\u0027Matricula\u0027]",
+                      "Nome": "@item()?[\u0027Nome\u0027]"
+                    }
+                  },
+                  "runAfter": {
+                    "Listar_linhas_presentes_em_uma_tabela": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Selecionar_Resultado": {
+                  "type": "Select",
+                  "inputs": {
+                    "from": "@outputs(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027body/value\u0027]",
+                    "select": {
+                      "Matricula": "@item()?[\u0027Matricula\u0027]",
+                      "Nome": "@item()?[\u0027Nome\u0027]",
+                      "StatusAvaliacao": "@if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),\u0027Restrita\u0027,item()?[\u0027StatusAvaliacao\u0027])",
+                      "HistoricoAvaliacoes": "@if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),null,item()?[\u0027HistoricoAvaliacoes\u0027])",
+                      "UltimoCicloAvaliacao": "@if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),null,item()?[\u0027UltimoCicloAvaliacao\u0027])",
+                      "UltimaNota": "@if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),null,item()?[\u0027UltimaNota\u0027])",
+                      "UltimoPotencial": "@if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),null,item()?[\u0027UltimoPotencial\u0027])"
+                    }
+                  },
+                  "runAfter": {
+                    "Selecionar_Candidatos": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "runAfter": {}
+            },
+            "Responder_Erro": {
+              "type": "Response",
+              "kind": "Skills",
+              "inputs": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "title": "status",
+                      "description": "encontrado, nao_encontrado, multiplos, restrita, sem_avaliacoes, entrada_invalida ou erro_tecnico.",
+                      "type": "string",
+                      "x-ms-content-hint": "TEXT",
+                      "x-ms-dynamically-added": true
+                    },
+                    "resultado": {
+                      "title": "resultado",
+                      "description": "JSON serializado com dados hist\u00F3ricos autorizados de uma pessoa ou apenas candidatos m\u00EDnimos para desambigua\u00E7\u00E3o.",
+                      "type": "string",
+                      "x-ms-content-hint": "TEXT",
+                      "x-ms-dynamically-added": true
+                    },
+                    "quantidade": {
+                      "title": "quantidade",
+                      "description": "Quantidade de colaboradores encontrados.",
+                      "type": "number",
+                      "x-ms-content-hint": "NUMBER",
+                      "x-ms-dynamically-added": true
+                    }
+                  },
+                  "additionalProperties": {}
+                },
+                "statusCode": 200,
+                "body": {
+                  "status": "erro_tecnico",
+                  "resultado": "[]",
+                  "quantidade": 0
+                }
+              },
+              "runAfter": {
+                "Consultar_E_Responder": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "6e173450-8815-4b06-a465-b62b552c22b0"
+              }
+            },
+            "Responder_Resultados": {
+              "type": "Response",
+              "kind": "Skills",
+              "inputs": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "title": "status",
+                      "description": "encontrado, nao_encontrado, multiplos, restrita, sem_avaliacoes, entrada_invalida ou erro_tecnico.",
+                      "type": "string",
+                      "x-ms-content-hint": "TEXT",
+                      "x-ms-dynamically-added": true
+                    },
+                    "resultado": {
+                      "title": "resultado",
+                      "description": "JSON serializado com dados hist\u00F3ricos autorizados de uma pessoa ou apenas candidatos m\u00EDnimos para desambigua\u00E7\u00E3o.",
+                      "type": "string",
+                      "x-ms-content-hint": "TEXT",
+                      "x-ms-dynamically-added": true
+                    },
+                    "quantidade": {
+                      "title": "quantidade",
+                      "description": "Quantidade de colaboradores encontrados.",
+                      "type": "number",
+                      "x-ms-content-hint": "NUMBER",
+                      "x-ms-dynamically-added": true
+                    }
+                  },
+                  "additionalProperties": {}
+                },
+                "statusCode": 200,
+                "body": {
+                  "status": "@{if(equals(length(body(\u0027Selecionar_Resultado\u0027)),0),\u0027nao_encontrado\u0027,if(greater(length(body(\u0027Selecionar_Resultado\u0027)),1),\u0027multiplos\u0027,if(equals(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027StatusAvaliacao\u0027],\u0027Restrita\u0027),\u0027restrita\u0027,if(and(empty(trim(string(coalesce(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027UltimaNota\u0027],\u0027\u0027)))),empty(trim(string(coalesce(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027UltimoPotencial\u0027],\u0027\u0027)))),or(empty(trim(string(coalesce(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027HistoricoAvaliacoes\u0027],\u0027\u0027)))),equals(trim(string(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027HistoricoAvaliacoes\u0027])),\u0027[]\u0027))),\u0027sem_avaliacoes\u0027,\u0027encontrado\u0027))))}",
+                  "resultado": "@{if(greater(length(body(\u0027Selecionar_Resultado\u0027)),1),string(body(\u0027Selecionar_Candidatos\u0027)),string(body(\u0027Selecionar_Resultado\u0027)))}",
+                  "quantidade": "@length(body(\u0027Selecionar_Resultado\u0027))"
+                }
+              },
+              "runAfter": {
+                "Consultar_E_Responder": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "7ffd075a-0d0d-48b9-929a-49a14af524d4"
+              }
+            }
+          },
+          "else": {
+            "actions": {
+              "Responder_Entrada_Invalida": {
+                "type": "Response",
+                "kind": "Skills",
+                "inputs": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "title": "status",
+                        "description": "encontrado, nao_encontrado, multiplos, restrita, sem_avaliacoes, entrada_invalida ou erro_tecnico.",
+                        "type": "string",
+                        "x-ms-content-hint": "TEXT",
+                        "x-ms-dynamically-added": true
+                      },
+                      "resultado": {
+                        "title": "resultado",
+                        "description": "JSON serializado com dados hist\u00F3ricos autorizados de uma pessoa ou apenas candidatos m\u00EDnimos para desambigua\u00E7\u00E3o.",
+                        "type": "string",
+                        "x-ms-content-hint": "TEXT",
+                        "x-ms-dynamically-added": true
+                      },
+                      "quantidade": {
+                        "title": "quantidade",
+                        "description": "Quantidade de colaboradores encontrados.",
+                        "type": "number",
+                        "x-ms-content-hint": "NUMBER",
+                        "x-ms-dynamically-added": true
+                      }
+                    },
+                    "additionalProperties": {}
+                  },
+                  "statusCode": 200,
+                  "body": {
+                    "status": "entrada_invalida",
+                    "resultado": "[]",
+                    "quantidade": 0
+                  }
+                },
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "602e0406-1385-48c9-948d-15a34475dd55"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Valor_normalizado": [
+              "Succeeded"
+            ]
+          }
+        }
+      },
+      "outputs": {},
+      "description": "When an agent calls the flow and send back a response."
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

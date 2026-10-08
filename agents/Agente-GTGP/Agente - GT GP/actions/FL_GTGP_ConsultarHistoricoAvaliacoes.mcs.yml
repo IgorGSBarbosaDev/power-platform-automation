@@ -1,0 +1,37 @@
+mcs.metadata:
+  componentName: FL_GTGP_ConsultarHistoricoAvaliacoes
+kind: TaskDialog
+inputs:
+  - kind: AutomaticTaskInput
+    propertyName: text
+    name: Campo
+    description: Use Nome ou Matricula para identificar uma única pessoa.
+
+  - kind: AutomaticTaskInput
+    propertyName: text_1
+    name: Valor
+    description: Nome completo ou parcial, ou matrícula integral. Desambigue resultados múltiplos.
+
+modelDisplayName: Consultar histórico de avaliações GT/GP
+modelDescription: |-
+  Consulta o histórico completo e os últimos resultados de avaliação de um participante GT/GP por nome ou matrícula. Use para histórico, todas as avaliações, evolução, última nota, último potencial ou última avaliação individual, sem exigir ciclo. Não use para um ciclo explícito nem para filtrar pessoas por nota ou potencial.
+outputs:
+  - propertyName: status
+    description: encontrado, nao_encontrado, multiplos, restrita, sem_avaliacoes, entrada_invalida ou erro_tecnico.
+
+  - propertyName: resultado
+    description: JSON serializado com avaliações autorizadas ou candidatos mínimos em caso de ambiguidade. Nunca inclui performance restrita.
+
+  - propertyName: quantidade
+    description: Quantidade de colaboradores encontrados, não de ciclos.
+
+action:
+  kind: InvokeFlowTaskAction
+  flowId: 08a908f4-b61a-497c-b2e0-14fec8f5eedd
+  connectionProperties:
+    $kind: ConnectionProperties
+    diagnostics:
+    mode: Invoker
+    usageDescription: Use sua conta corporativa para consultar dados autorizados de avaliações GT/GP.
+
+outputMode: All

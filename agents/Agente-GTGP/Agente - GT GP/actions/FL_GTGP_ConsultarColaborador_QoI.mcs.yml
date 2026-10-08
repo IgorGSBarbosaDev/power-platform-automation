@@ -1,0 +1,19 @@
+mcs.metadata:
+  componentName: FL_GTGP_ConsultarColaborador
+kind: TaskDialog
+modelDisplayName: Consultar Colaborador
+modelDescription: Consulta dados cadastrais e profissionais de um participante GT/GP específico, identificado por nome completo, nome parcial ou matrícula. Retorna os campos de perfil disponíveis, sem notas, potenciais, etapas ou comentários de avaliação. Use para consultas individuais de cadastro, programa vigente, geração, enquadre, cargo e área. Não utilize para histórico ou ciclos de avaliação, nem para listar ou filtrar grupos; use as ferramentas específicas correspondentes.
+outputs:
+  - propertyName: status
+
+  - propertyName: resultado
+
+action:
+  kind: InvokeFlowTaskAction
+  flowId: d898fc48-61a5-f111-b8dd-00224808b0ee
+  connectionProperties:
+    $kind: ConnectionProperties
+    diagnostics:
+    mode: Invoker
+
+outputMode: All

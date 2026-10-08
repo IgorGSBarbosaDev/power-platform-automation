@@ -36,7 +36,7 @@
               "type": "object",
               "properties": {
                 "text": {
-                  "description": "Crit\u00E9rio usado para localizar os colaboradores. Pode ser Nome, Matricula, CEO1, CEO2, CEO3, CEO4, CEO5, CEO6, CEO7, Programa, Status, Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo ou IndustrialStaff.",
+                  "description": "Crit\u00E9rio de busca: Nome, Matricula, CEO3/CEO4/CEO5 (\u00E1rea atual), AreaFimCEO1..5 (destino), Programa, Status, Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo, IndustrialStaff ou STEM.",
                   "title": "campo",
                   "type": "string",
                   "x-ms-content-hint": "TEXT",
@@ -45,6 +45,13 @@
                 "text_1": {
                   "description": "Nome, matr\u00EDcula ou valor organizacional que deve ser pesquisado.",
                   "title": "valor",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "text_2": {
+                  "description": "Ciclo espec\u00EDfico opcional, usado nas colunas Nota_\u003Cciclo\u003E e Potencial_\u003Cciclo\u003E. Deixe vazio para usar a \u00FAltima avalia\u00E7\u00E3o e o hist\u00F3rico.",
+                  "title": "ciclo",
                   "type": "string",
                   "x-ms-content-hint": "TEXT",
                   "x-ms-dynamically-added": true
@@ -71,21 +78,21 @@
               "properties": {
                 "status": {
                   "title": "status",
-                  "description": "Indica o resultado da consulta de avalia\u00E7\u00F5es. Retorna encontrado quando houver pelo menos um colaborador com resultado, ou nao_encontrado quando nenhum colaborador corresponder ao filtro informado.",
+                  "description": "encontrado, nao_encontrado, multiplos, restrita, sem_avaliacao, ciclo_inexistente ou ciclo_invalido.",
                   "type": "string",
                   "x-ms-content-hint": "TEXT",
                   "x-ms-dynamically-added": true
                 },
                 "resultado": {
                   "title": "resultado",
-                  "description": "Quantidade total de colaboradores encontrados na consulta de avalia\u00E7\u00F5es.",
+                  "description": "JSON serializado com avalia\u00E7\u00E3o autorizada do ciclo pedido, ou candidatos m\u00EDnimos quando o nome for amb\u00EDguo.",
                   "type": "string",
                   "x-ms-content-hint": "TEXT",
                   "x-ms-dynamically-added": true
                 },
                 "quantidade": {
                   "title": "quantidade",
-                  "description": "Cont\u00E9m os colaboradores encontrados com Nome, Matr\u00EDcula e Hist\u00F3rico de Avalia\u00E7\u00F5es. O hist\u00F3rico re\u00FAne os ciclos dispon\u00EDveis com Nota, Potencial e Etapa. Use estes dados para responder perguntas sobre avalia\u00E7\u00E3o, desempenho, nota, potencial, \u00FAltima avalia\u00E7\u00E3o ou hist\u00F3rico de avalia\u00E7\u00F5es.",
+                  "description": "Quantidade de colaboradores encontrados.",
                   "type": "number",
                   "x-ms-content-hint": "NUMBER",
                   "x-ms-dynamically-added": true
@@ -95,13 +102,13 @@
             },
             "statusCode": 200,
             "body": {
-              "status": "@{if(\r\n    equals(length(body(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027value\u0027]), 0),\r\n    \u0027nao_encontrado\u0027,\r\n    \u0027encontrado\u0027\r\n)}",
-              "resultado": "@{string(body(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027value\u0027])}",
-              "quantidade": "@length(body(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027value\u0027])"
+              "status": "@{if(not(outputs(\u0027Ciclo_Valido\u0027)),\u0027ciclo_invalido\u0027,if(equals(length(body(\u0027Selecionar_Resultado\u0027)),0),\u0027nao_encontrado\u0027,if(and(equals(triggerBody()?[\u0027text\u0027],\u0027Nome\u0027),greater(length(body(\u0027Selecionar_Resultado\u0027)),1)),\u0027multiplos\u0027,if(equals(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027StatusAvaliacao\u0027],\u0027Restrita\u0027),\u0027restrita\u0027,if(empty(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027)))),\u0027encontrado\u0027,if(not(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027CicloDisponivel\u0027]),\u0027ciclo_inexistente\u0027,if(and(empty(trim(string(coalesce(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027NotaCiclo\u0027],\u0027\u0027)))),empty(trim(string(coalesce(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027PotencialCiclo\u0027],\u0027\u0027))))),\u0027sem_avaliacao\u0027,\u0027encontrado\u0027)))))))}",
+              "resultado": "@{if(not(outputs(\u0027Ciclo_Valido\u0027)),\u0027[]\u0027,if(and(equals(triggerBody()?[\u0027text\u0027],\u0027Nome\u0027),greater(length(body(\u0027Selecionar_Resultado\u0027)),1)),string(body(\u0027Selecionar_Candidatos\u0027)),if(equals(length(body(\u0027Selecionar_Resultado\u0027)),0),\u0027[]\u0027,if(and(not(empty(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027))))),not(first(body(\u0027Selecionar_Resultado\u0027))?[\u0027CicloDisponivel\u0027])),\u0027[]\u0027,string(body(\u0027Selecionar_Resultado\u0027))))))}",
+              "quantidade": "@length(body(\u0027Selecionar_Resultado\u0027))"
             }
           },
           "runAfter": {
-            "Listar_linhas_presentes_em_uma_tabela": [
+            "Selecionar_Candidatos": [
               "Succeeded"
             ]
           },
@@ -151,7 +158,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaFiltro",
-                    "value": "DescricaoCEO1"
+                    "value": "Area_Fim_CEO1"
                   }
                 }
               },
@@ -163,7 +170,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaFiltro",
-                    "value": "DescricaoCEO3"
+                    "value": "CEO3_Atual"
                   }
                 }
               },
@@ -175,7 +182,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaFiltro",
-                    "value": "DescricaoCEO4"
+                    "value": "CEO4_Atual"
                   }
                 }
               },
@@ -187,7 +194,7 @@
                   "type": "SetVariable",
                   "inputs": {
                     "name": "ColunaFiltro",
-                    "value": "DescricaoCEO5"
+                    "value": "CEO5_Atual"
                   }
                 }
               },
@@ -312,17 +319,101 @@
                 }
               },
               "case": "Matricula"
+            },
+            "CEO2": {
+              "actions": {
+                "Definir_CEO2": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO2"
+                  }
+                }
+              },
+              "case": "CEO2"
+            },
+            "STEM": {
+              "actions": {
+                "Definir_STEM": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Classificacao_STEM"
+                  }
+                }
+              },
+              "case": "STEM"
+            },
+            "AreaFimCEO1": {
+              "actions": {
+                "Definir_AreaFimCEO1": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO1"
+                  }
+                }
+              },
+              "case": "AreaFimCEO1"
+            },
+            "AreaFimCEO2": {
+              "actions": {
+                "Definir_AreaFimCEO2": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO2"
+                  }
+                }
+              },
+              "case": "AreaFimCEO2"
+            },
+            "AreaFimCEO3": {
+              "actions": {
+                "Definir_AreaFimCEO3": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO3"
+                  }
+                }
+              },
+              "case": "AreaFimCEO3"
+            },
+            "AreaFimCEO4": {
+              "actions": {
+                "Definir_AreaFimCEO4": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO4"
+                  }
+                }
+              },
+              "case": "AreaFimCEO4"
+            },
+            "AreaFimCEO5": {
+              "actions": {
+                "Definir_AreaFimCEO5": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ColunaFiltro",
+                    "value": "Area_Fim_CEO5"
+                  }
+                }
+              },
+              "case": "AreaFimCEO5"
             }
           },
           "runAfter": {
-            "Inicializar_ValorFiltro": [
+            "Ciclo_Valido": [
               "Succeeded"
             ]
           }
         },
         "FiltroOData": {
           "type": "Compose",
-          "inputs": "@if(\r\n    equals(triggerBody()?[\u0027campo\u0027], \u0027Matricula\u0027),\r\n    concat(\r\n        variables(\u0027ColunaFiltro\u0027),\r\n        \u0027 eq \u0027\u0027\u0027,\r\n        replace(trim(variables(\u0027ValorFiltro\u0027)),\u0027\u0027\u0027\u0027,\u0027\u0027\u0027\u0027\u0027\u0027),\r\n        \u0027\u0027\u0027\u0027\r\n    ),\r\n    concat(\r\n        \u0027contains(\u0027,\r\n        variables(\u0027ColunaFiltro\u0027),\r\n        \u0027,\u0027\u0027\u0027,\r\n        replace(trim(variables(\u0027ValorFiltro\u0027)),\u0027\u0027\u0027\u0027,\u0027\u0027\u0027\u0027\u0027\u0027),\r\n        \u0027\u0027\u0027)\u0027\r\n    )\r\n)",
+          "inputs": "@if(\r\n    equals(triggerBody()?[\u0027text\u0027], \u0027Matricula\u0027),\r\n    concat(\r\n        variables(\u0027ColunaFiltro\u0027),\r\n        \u0027 eq \u0027\u0027\u0027,\r\n        replace(trim(variables(\u0027ValorFiltro\u0027)),\u0027\u0027\u0027\u0027,\u0027\u0027\u0027\u0027\u0027\u0027),\r\n        \u0027\u0027\u0027\u0027\r\n    ),\r\n    concat(\r\n        \u0027contains(\u0027,\r\n        variables(\u0027ColunaFiltro\u0027),\r\n        \u0027,\u0027\u0027\u0027,\r\n        replace(trim(variables(\u0027ValorFiltro\u0027)),\u0027\u0027\u0027\u0027,\u0027\u0027\u0027\u0027\u0027\u0027),\r\n        \u0027\u0027\u0027)\u0027\r\n    )\r\n)",
           "runAfter": {
             "Op\u00E7\u00E3o": [
               "Succeeded"
@@ -337,8 +428,7 @@
               "drive": "b!lMd-qKD81UKhxH_CWtN0oZdjDya1bPhAqCawCBjCpNA_nShNGg0STr1IEJzcoTjP",
               "file": "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D",
               "table": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}",
-              "$filter": "@outputs(\u0027FiltroOData\u0027)",
-              "$select": "Matricula,Nome,HistoricoAvaliacoes,UltimoCicloAvaliacao,UltimaNota,UltimoPotencial"
+              "$filter": "@outputs(\u0027FiltroOData\u0027)"
             },
             "host": {
               "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
@@ -354,6 +444,53 @@
           "metadata": {
             "01MP4XMHM5VAVRFXKTZFBII74KVSG7SU2D": "/Canal Talent Development/Programas GT e GP/Base/Base GTGP.xlsx",
             "tableId": "{0E6150C4-AD01-4E2A-8044-06CE76D7AF0D}"
+          }
+        },
+        "Selecionar_Resultado": {
+          "type": "Select",
+          "inputs": {
+            "from": "@outputs(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027body/value\u0027]",
+            "select": {
+              "Matricula": "@item()?[\u0027Matricula\u0027]",
+              "Nome": "@item()?[\u0027Nome\u0027]",
+              "StatusAvaliacao": "@if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),\u0027Restrita\u0027,item()?[\u0027StatusAvaliacao\u0027])",
+              "HistoricoAvaliacoes": "@if(empty(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027)))),if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),null,item()?[\u0027HistoricoAvaliacoes\u0027]),null)",
+              "UltimoCicloAvaliacao": "@if(empty(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027)))),if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),null,item()?[\u0027UltimoCicloAvaliacao\u0027]),null)",
+              "UltimaNota": "@if(empty(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027)))),if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),null,item()?[\u0027UltimaNota\u0027]),null)",
+              "UltimoPotencial": "@if(empty(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027)))),if(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),null,item()?[\u0027UltimoPotencial\u0027]),null)",
+              "NotaCiclo": "@if(or(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),empty(trim(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027)))),null,item()?[concat(\u0027Nota_\u0027,replace(trim(triggerBody()?[\u0027text_2\u0027]),\u0027.\u0027,\u0027_\u0027))])",
+              "PotencialCiclo": "@if(or(or(not(contains(createArray(\u0027\u0027,\u0027nao\u0027,\u0027n\u00E3o\u0027,\u0027false\u0027,\u00270\u0027,\u0027n\u0027),toLower(trim(string(coalesce(item()?[\u0027RestricaoPerformance\u0027],\u0027\u0027)))))),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrita\u0027),equals(toLower(trim(string(coalesce(item()?[\u0027StatusAvaliacao\u0027],\u0027\u0027)))),\u0027restrito\u0027)),empty(trim(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027)))),null,item()?[concat(\u0027Potencial_\u0027,replace(trim(triggerBody()?[\u0027text_2\u0027]),\u0027.\u0027,\u0027_\u0027))])",
+              "CicloDisponivel": "@if(empty(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027)))),true,or(contains(item(),concat(\u0027Nota_\u0027,replace(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027))),\u0027.\u0027,\u0027_\u0027))),contains(item(),concat(\u0027Potencial_\u0027,replace(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027))),\u0027.\u0027,\u0027_\u0027)))))"
+            }
+          },
+          "runAfter": {
+            "Listar_linhas_presentes_em_uma_tabela": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Ciclo_Valido": {
+          "type": "Compose",
+          "inputs": "@or(empty(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027)))),and(equals(length(split(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027))),\u0027.\u0027)),2),equals(length(first(split(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027))),\u0027.\u0027))),4),isInt(first(split(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027))),\u0027.\u0027))),or(equals(last(split(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027))),\u0027.\u0027)),\u00271\u0027),equals(last(split(trim(string(coalesce(triggerBody()?[\u0027text_2\u0027],\u0027\u0027))),\u0027.\u0027)),\u00272\u0027))))",
+          "runAfter": {
+            "Inicializar_ValorFiltro": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Selecionar_Candidatos": {
+          "type": "Select",
+          "inputs": {
+            "from": "@outputs(\u0027Listar_linhas_presentes_em_uma_tabela\u0027)?[\u0027body/value\u0027]",
+            "select": {
+              "Matricula": "@item()?[\u0027Matricula\u0027]",
+              "Nome": "@item()?[\u0027Nome\u0027]"
+            }
+          },
+          "runAfter": {
+            "Selecionar_Resultado": [
+              "Succeeded"
+            ]
           }
         }
       },

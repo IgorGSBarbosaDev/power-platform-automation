@@ -1,0 +1,27 @@
+mcs.metadata:
+  componentName: Ajuda Capacidade
+kind: AdaptiveDialog
+modelDescription: Use este tópico quando o usuário quiser saber o que o agente GTGP consegue fazer, como utilizá-lo, quais informações podem ser consultadas ou pedir exemplos de perguntas que podem ser feitas.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent: {}
+  actions:
+    - kind: SendActivity
+      id: sendActivity_h9sTJQ
+      activity: |-
+        Posso auxiliar com consultas relacionadas aos programas GT e GP.
+        Você pode me pedir, por exemplo:
+        - dados de um trainee;
+        - última nota e potencial;
+        - histórico de avaliações;
+        - trainees de determinada área;
+        - programa vigente e enquadre;
+        - informações organizacionais e cargo;
+        - etapa atual do processo de GT/GP;
+        - explicações sobre o funcionamento e as etapas do processo.
+
+        Para consultas individuais, você pode informar o nome ou a matrícula do colaborador.
+
+inputType: {}
+outputType: {}

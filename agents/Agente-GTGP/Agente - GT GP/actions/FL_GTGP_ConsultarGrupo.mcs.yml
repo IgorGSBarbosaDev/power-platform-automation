@@ -5,50 +5,33 @@ inputs:
   - kind: AutomaticTaskInput
     propertyName: text
     description: |-
-      Campo da Base GTGP usado para filtrar os colaboradores.
-
-      Valores permitidos:
-      CEO1, CEO2, CEO3, CEO4, CEO5, CEO6, CEO7, Programa, Status,
-      Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo, IndustrialStaff.
-
-      Regras:
-      - Quando o usuário mencionar uma área ou função organizacional sem informar o nível, como RH, Recursos Humanos, Financeiro ou Jurídico, use CEO4.
-      - Só use CEO1, CEO2, CEO3, CEO5, CEO6 ou CEO7 quando o usuário indicar explicitamente esse nível.
-      - Para programa GT/GP use Programa.
-      - Para enquadramento use Enquadre.
-      - Para Pool RH ou Área use Status.
+      Use um único critério coletivo: CEO3, CEO4 ou CEO5 para área atual;
+      AreaFimCEO1 a AreaFimCEO5 para área final; ou Programa, Status,
+      Enquadre, GeracaoGT, GeracaoGP, Localidade, Cargo, IndustrialStaff, STEM.
+      CEO1 e CEO2 representam apenas os níveis 1 e 2 da área final.
+      Para área sem nível explícito, como RH, use CEO4 (área atual).
+      Use Programa somente quando o usuário mencionar GT, GP,
+      Global Trainee ou Global Professional explicitamente.
+      "Trainees" ou "participantes" não define Programa.
 
   - kind: AutomaticTaskInput
     propertyName: text_1
     description: |-
-      Valor usado para filtrar a Base GTGP.
+      Valor do critério informado. Para RH/Recursos Humanos/HR como área,
+      use CEO4 e Human Resources. Para Pool RH, use Status e Pool RH.
+      Preserve os demais valores conforme a base.
 
-      Quando o usuário utilizar abreviações ou nomes em português, converta para a nomenclatura utilizada na base.
-
-      Exemplos:
-      RH, Recursos Humanos ou HR → Human Resources
-      TI, T.I., Tecnologia da Informação ou IT → Information Technology
-
-      Quando não houver uma correspondência conhecida, preserve o valor informado pelo usuário.
-
-      Exemplos:
-      "pessoas do RH" → RH
-      "todos os GP3" → GP3
-      "todos os Trainees" → GTs no geral
-      "quem está em Pool RH" → Pool RH
-      "pessoas de Belo Horizonte" → Belo Horizonte
-
+modelDisplayName: Consultar grupo GT/GP
+modelDescription: Consulta participantes GT/GP por um único critério coletivo. Use para lista ou contagem por área atual, área final, geração, programa explícito, STEM, localidade ou outro critério suportado. Para dois ou mais critérios, use ConsultarGrupoAvancado.
 outputs:
   - propertyName: status
+    description: Indica se a consulta encontrou participantes correspondentes ao critério informado.
 
   - propertyName: quantidade
     description: Quantidade total de colaboradores encontrados. Use apenas como informação complementar à lista quando o usuário solicitar os colaboradores.
 
   - propertyName: resultado
-    description: |-
-      Lista completa dos colaboradores encontrados pela consulta, contendo nome, matrícula, cargo, programa, status, enquadramento, geração, CEO e localidade.
-
-      Quando o usuário pedir "todos", "liste", "quem são", "quais pessoas" ou equivalente, use esta saída para apresentar TODOS os registros retornados. Nunca responda apenas com a quantidade quando a lista completa estiver disponível.
+    description: Lista completa com dados cadastrais, acadêmicos, área atual, área final, vaga e rotações. Ao pedir lista, apresente todos os registros retornados.
 
 action:
   kind: InvokeFlowTaskAction
